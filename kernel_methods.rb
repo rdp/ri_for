@@ -1,6 +1,5 @@
 =begin rdoc
- Supplement [monkey patch] the existing #methods call so that it now has an optional parameter
- and also returns lists that are more helpful.
+ Supplement [monkey patch] Kernel#methods so that it returns lists that are split into two kind of [adds a marker where the inherited methods begin].
 =end
 module Kernel
  alias :methods_old :methods
@@ -19,3 +18,6 @@ if $0 == __FILE__
  puts 'A.methods', A.methods(true).inspect, A.methods(false).inspect
  puts 'A.new.methods', A.new.methods.inspect
 end
+
+
+
