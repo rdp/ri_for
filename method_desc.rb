@@ -1,28 +1,53 @@
-# from http://p.ramaze.net/17901
-
+# originally gleaned from http://p.ramaze.net/17901
 
 module SourceLocationDesc
   # add a Method#desc which reads off the method's rdocs if any exist
   # 1.9 only
   def desc
-    file, line = source_location
-    *head, sig = File.readlines(file)[0...line]
     doc = []
+    if respond_to? :source_location
+      file, line = source_location
+    end
+    if file
+      # then it's a pure ruby method
+      head_and_sig = File.readlines(file)[0...line]
+      sig = head_and_sig[-1]
+      head = head_and_sig[0..-2]
 
-    # needs more sophistication, but well... :)
-    head.reverse_each do |line|
-      break unless line =~ /^\s*#(.*)/
-      doc.unshift $1.strip
+      # needs more sophistication, but well... :)
+      head.reverse_each do |line|
+        break unless line =~ /^\s*#(.*)/
+        doc.unshift $1.strip
+      end
+    else
+      doc << 'Binary method or you\'re not in 1.9'
     end
 
-    prog_sig = "Programmatic signature: %s %p" % [name, parameters]
-    orig_sig = "Original signature: %s" % sig.strip
-    [prog_sig, orig_sig, ''] + doc
+    if respond_to? :parameters
+      prog_sig = "Programmatic signature: %s %p" % [name, parameters]
+      orig_sig = "Original signature: %s" % sig.to_s.strip
+      [prog_sig, orig_sig, ''] + doc
+    else
+      doc
+    end
   end
 end
 
 class Method; include SourceLocationDesc; end
 class UnboundMethod; include SourceLocationDesc; end
+
+
+class Object
+  # currently rather verbose, but will attempt to describe all it knows about a method
+  def method_desc name
+    if self.is_a? Class
+       # i.e. String.strip
+       instance_method(name).desc
+    else
+       method(name).desc
+    end
+  end
+end
 
 if $0 == __FILE__
   require 'pathname'
@@ -31,4 +56,7 @@ if $0 == __FILE__
   puts "=" * 80
   puts Pathname.instance_method(:ftype).desc
   puts "=" * 80
+  # now some binaries:
+  puts ''.method_desc :strip
+  puts String.method_desc :strip
 end

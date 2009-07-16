@@ -1,0 +1,7 @@
+Some helpers so that introspecting methods at runtime is *much* nicer.
+
+How to use:
+require 'xxx'
+''.desc :strip
+or
+String.method_desc :strip
