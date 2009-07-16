@@ -1,0 +1,6 @@
+for 1.9.x could depend on that #parameters helper
+
+rdoc at least 2.3.0
+require_all
+
+rogerdpack-arguments

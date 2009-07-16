@@ -1,0 +1,8 @@
+pipe it into ri itself
+use parsetree for 1.8.6
+
+add lean version [?]
+
+remote ri
+
+add Class.desc # yeah!
