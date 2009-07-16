@@ -14,13 +14,13 @@ module SourceLocationDesc
     full_name = $1
     class_name = $2
     method_name = $3
-    
-    
+
+
     # now default RI for the same:
     begin
       RDoc::RI::Driver.run [full_name]
     rescue SystemExit
-     # not found
+      # not found
     end
 
 
@@ -33,20 +33,20 @@ module SourceLocationDesc
       doc << Arguments.names( eval(class_name), method_name)
     else
       file, line = source_location
-     if file
-      # then it's a pure ruby method
-      head_and_sig = File.readlines(file)[0...line]
-      sig = head_and_sig[-1]
-      head = head_and_sig[0..-2]
+      if file
+        # then it's a pure ruby method
+        head_and_sig = File.readlines(file)[0...line]
+        sig = head_and_sig[-1]
+        head = head_and_sig[0..-2]
 
-      # needs more sophistication, but well... :)
-      head.reverse_each do |line|
-        break unless line =~ /^\s*#(.*)/
-        doc.unshift "     " + $1.strip
+        # needs more sophistication, but well... :)
+        head.reverse_each do |line|
+          break unless line =~ /^\s*#(.*)/
+          doc.unshift "     " + $1.strip
+        end
+      else
+        doc << 'binary method (c)'
       end
-     else
-      doc << 'binary method (c)'
-     end
     end
 
     if respond_to? :parameters
@@ -70,12 +70,13 @@ class Object
   # currently rather verbose, but will attempt to describe all it knows about a method
   def method_desc name
     if self.is_a? Class
-       # i.e. String.strip
-       instance_method(name).desc
+      # i.e. String.strip
+      instance_method(name).desc
     else
-       method(name).desc
+      method(name).desc
     end
   end
+  alias :desc_method :method_desc
 end
 
 =begin 
