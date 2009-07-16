@@ -6,8 +6,8 @@ require 'rdoc/ri/driver'
 module SourceLocationDesc
   # add a Method#desc which reads off the method's rdocs if any exist
   # 1.9 only
-  def desc
-    doc = []
+  def desc want_output = false
+    doc = [to_s, "arity: #{arity}"]
     if respond_to? :source_location
       file, line = source_location
     end
@@ -37,7 +37,12 @@ module SourceLocationDesc
     # now default RI for the same:
     # to_s is something like "#<Method: String#strip>"
     to_s =~ /ethod: (.*)>/
-    RDoc::RI::Driver.run [$1]
+    begin
+      RDoc::RI::Driver.run [$1]
+    rescue SystemExit
+     # not found
+    end
+    doc if want_output
   end
 end
 
@@ -68,3 +73,18 @@ if $0 == __FILE__
   puts ''.method_desc :strip
   puts String.method_desc :strip
 end
+
+=begin 
+>> require 'pathname'
+doctest:
+ it should display the name
+>> Pathname.instance_method(:children).desc(true).grep(/children/)
+=>  ["#<UnboundMethod: Pathname#children>"]
+
+ and arity
+>> Pathname.instance_method(:children).desc(true).grep(/arity/)
+=>  ["arity: -1"]
+
+# todo: one that is guaranteed to exit you early [no docs at all ever]
+
+=end
