@@ -1,4 +1,7 @@
 # originally gleaned from http://p.ramaze.net/17901
+require 'rubygems'
+require 'rdoc'
+require 'rdoc/ri/driver'
 
 module SourceLocationDesc
   # add a Method#desc which reads off the method's rdocs if any exist
@@ -26,10 +29,15 @@ module SourceLocationDesc
     if respond_to? :parameters
       prog_sig = "Programmatic signature: %s %p" % [name, parameters]
       orig_sig = "Original signature: %s" % sig.to_s.strip
-      [prog_sig, orig_sig, ''] + doc
+      puts [prog_sig, orig_sig, ''] + doc
     else
-      doc
+      puts doc
     end
+
+    # now default RI for the same:
+    # to_s is something like "#<Method: String#strip>"
+    to_s =~ /ethod: (.*)>/
+    RDoc::RI::Driver.run [$1]
   end
 end
 

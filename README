@@ -5,3 +5,6 @@ require 'xxx'
 ''.desc :strip
 or
 String.method_desc :strip
+
+
+Note: if you want this to work *well* on 1.8.6 then you'll want to install ParseTree first
