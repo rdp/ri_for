@@ -1,10 +1,20 @@
-Some helpers so that introspecting methods at runtime is *much* nicer.
+Some helpers so that introspecting methods from irb is *much* nicer.
 
 How to use:
-require 'xxx'
+require 'lib/desc_method'
 ''.desc :strip
 or
 String.method_desc :strip
+
+
+How to install (sorry it's by hand currently_
+
+gem install rdoc
+gem install require_all
+gem install rogerdpack-arguments
+git clone 
+then fire up irb and require 'lib/desc_method'
+
 
 
 Note: if you want this to work *well* on 1.8.6 then you'll want to install ParseTree first
