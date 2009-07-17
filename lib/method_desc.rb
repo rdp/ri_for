@@ -2,11 +2,17 @@
 require 'rubygems'
 require 'rdoc'
 require 'rdoc/ri/driver'
+begin
+  gem 'arguments' # TODO why is this necessary?
+  require 'arguments' # rogerdpack-arguments
+rescue LoadError
+  require 'arguments' # 1.9
+end
 
 module SourceLocationDesc
   # add a Method#desc which reads off the method's rdocs if any exist
   # 1.9 only
-  def desc want_output = false
+  def desc want_output = false, want_one_liner = false
     doc = []
 
     # to_s is something like "#<Method: String#strip>"
@@ -18,7 +24,7 @@ module SourceLocationDesc
 
     # now default RI for the same:
     begin
-      RDoc::RI::Driver.run [full_name]
+      RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_one_liner
     rescue SystemExit
       # not found
     end
@@ -28,9 +34,13 @@ module SourceLocationDesc
 
     if !(respond_to? :source_location)
       # pull out names for 1.8
-      gem 'arguments' # TODO why is this necessary?
-      require 'arguments' # rogerdpack-arguments
-      doc << Arguments.names( eval(class_name), method_name)
+      begin
+        args = Arguments.names( eval(class_name), method_name)
+        return args if want_one_liner
+        doc << args
+      rescue Exception 
+        puts "please install the ParseTree gem"
+      end
     else
       file, line = source_location
       if file
@@ -38,6 +48,7 @@ module SourceLocationDesc
         head_and_sig = File.readlines(file)[0...line]
         sig = head_and_sig[-1]
         head = head_and_sig[0..-2]
+        return sig + "\n" + head[0] if want_one_liner
 
         # needs more sophistication, but well... :)
         head.reverse_each do |line|
@@ -60,6 +71,7 @@ module SourceLocationDesc
 
     doc if want_output
   end
+  named_args_for :desc
 end
 
 class Method; include SourceLocationDesc; end
@@ -83,11 +95,11 @@ end
 doctest:
 >> require 'pathname'
 it should display the name
->> Pathname.instance_method(:children).desc(true).grep(/children/).size > 0
+>> Pathname.instance_method(:children).desc(:want_output => true).grep(/children/).size > 0
 =>  true # ["#<UnboundMethod: Pathname#children>"]
 
 and arity
->> Pathname.instance_method(:children).desc(true).grep(/arity/)
+>> Pathname.instance_method(:children).desc(:want_output => true).grep(/arity/)
 =>  ["arity: -1"]
 
 # todo: one that is guaranteed to exit you early [no docs at all ever]

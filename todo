@@ -1,8 +1,13 @@
-pipe it into ri itself
-use parsetree for 1.8.6
-
-add lean version [?]
+add lean version [?] -- non lean could have full methods, too
 
 remote ri
 
-add Class.desc # yeah!
+class could look for descriptions above where its methods 
+
+somehow figure out that String includes comparable
+
+class could display one liners per method, too...
+
+display full code for 1.8
+
+for contants can even put what they are [...]?
