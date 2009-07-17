@@ -8,3 +8,8 @@ String.method_desc :strip
 
 
 Note: if you want this to work *well* on 1.8.6 then you'll want to install ParseTree first
+If you don't have the ri files for core [i.e. running "ri File" fails to return anything useful] then you're kind of stuck--you could request them from your package maintainer.
+
+If you have not built them for your gems, you can easily:
+
+gem rdoc --all --ri
