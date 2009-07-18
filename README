@@ -1,11 +1,14 @@
 Some helpers so that introspecting methods from irb is *much* nicer.
 
 How to use:
-require 'lib/desc_method'
-''.desc :strip
+
+'string'.desc :strip
 or
 String.method_desc :strip
+or
+String.method(:strip).desc
 
+TODO a real example
 
 How to install (sorry it's by hand currently_
 
@@ -15,11 +18,23 @@ gem install rogerdpack-arguments
 git clone 
 then fire up irb and require 'lib/desc_method'
 
+Note: if you want this to work *well* on 1.8.6 then you'll want to install ParseTree
 
+TODO dependency on it
 
-Note: if you want this to work *well* on 1.8.6 then you'll want to install ParseTree first
 If you don't have the ri files for core [i.e. running "ri File" fails to return anything useful] then you're kind of stuck--you could request them from your package maintainer.
 
 If you have not built them for your gems, you can easily:
 
 gem rdoc --all --ri
+
+Also, if your methods are built at run-time [i.e. meta programming] like
+
+a.class_eval "
+# a method
+def go
+ end
+end
+"
+
+You could still access rdoc style descriptions by using the remembered_evals gem.
