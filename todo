@@ -13,3 +13,5 @@ display full code for 1.8, and in 1.9 (from the source files)
 for contants can even put what they are [...]?
 
 can we pull from trans' webri?
+
+remove dependency on named args--that's too extreme

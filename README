@@ -12,15 +12,8 @@ TODO a real example
 
 How to install (sorry it's by hand currently_
 
-gem install rdoc
-gem install require_all
-gem install rogerdpack-arguments
-git clone 
-then fire up irb and require 'lib/desc_method'
+gem install rogerdpack-method_descriptor
 
-Note: if you want this to work *well* on 1.8.6 then you'll want to install ParseTree
-
-TODO dependency on it
 
 If you don't have the ri files for core [i.e. running "ri File" fails to return anything useful] then you're kind of stuck--you could request them from your package maintainer.
 

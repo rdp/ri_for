@@ -77,7 +77,6 @@ end
 class Method; include SourceLocationDesc; end
 class UnboundMethod; include SourceLocationDesc; end
 
-
 class Object
   # currently rather verbose, but will attempt to describe all it knows about a method
   def method_desc name
@@ -88,7 +87,7 @@ class Object
       method(name).desc
     end
   end
-  alias :desc_method :method_desc
+  alias :desc_method :method_desc # you can have it either way
 end
 
 =begin 
