@@ -1,4 +1,4 @@
-require './method_desc'
+require_rel 'method_desc'
 class Object
   # just runs ri against the class, outputs a big
   def desc return_stuff = false
