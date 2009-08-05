@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{method_describer}
-  s.version = "0.0.2"
+  s.version = "0.0.4"
  
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.]}

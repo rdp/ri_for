@@ -10,21 +10,35 @@ rescue LoadError
 end
 
 module SourceLocationDesc
-  # add a Method#desc which reads off the method's rdocs if any exist
-  # 1.9 only
-  def desc want_output = false, want_one_liner = false
+
+  # add a Method#desc which spits out all it knows about that method
+  # ri, location, local ri, etc.
+  # TODO does this work with class methods?
+  def desc want_just_summary = false
     doc = []
 
     # to_s is something like "#<Method: String#strip>"
-    to_s =~ /ethod: ((.*)#(.*))>/
-    full_name = $1
-    class_name = $2
-    method_name = $3
+    # or #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
+    string = to_s
 
+    if string.include? '('
+      # case #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
+      string =~ /\((.*)\)/ # extract out what is between parentheses for the classname
+      class_name = $1
+    else
+      # case "#<Method: String#strip>"
+      string =~ /Method: (.*)#>/
+      class_name = $1
+    end
 
-    # now default RI for the same:
+    string =~ /Method: .*#(.*)>/
+    method_name = $1
+    full_name = "#{class_name}##{method_name}"
+
+    # now run default RI for it
     begin
-      RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_one_liner
+      puts 'ri for ' + full_name
+      RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
     rescue SystemExit
       # not found
     end
@@ -36,10 +50,10 @@ module SourceLocationDesc
       # pull out names for 1.8
       begin
         args = Arguments.names( eval(class_name), method_name)
-        return args if want_one_liner
-        doc << args
-      rescue Exception 
-        puts "please install the ParseTree gem"
+        doc << "parameters:" + args.join(',')
+        return args if want_just_summary
+      rescue Exception => e
+        puts "please install the ParseTree gem #{e}"
       end
     else
       file, line = source_location
@@ -48,15 +62,15 @@ module SourceLocationDesc
         head_and_sig = File.readlines(file)[0...line]
         sig = head_and_sig[-1]
         head = head_and_sig[0..-2]
-        return sig + "\n" + head[0] if want_one_liner
 
         # needs more sophistication, but well... :)
         head.reverse_each do |line|
           break unless line =~ /^\s*#(.*)/
           doc.unshift "     " + $1.strip
         end
+        return sig + "\n" + head[0] if want_just_summary
       else
-        doc << 'binary method (c)'
+        doc << 'appears to be a binary method (c)'
       end
     end
 
@@ -67,16 +81,19 @@ module SourceLocationDesc
     end
     # put arity at the end
     doc += [to_s, "arity: #{arity}"]
-    puts doc
+    puts doc # always output it since RI does currently [todo]
 
-    doc if want_output
+    doc # give them something they can examine
   end
-  named_args_for :desc
+
+  named_args_for :desc # just for fun, tests use it too, plus it should actually wurk without interfering...I think
+
 end
 
 class Method; include SourceLocationDesc; end
 class UnboundMethod; include SourceLocationDesc; end
 
+# TODO mixin a separate module
 class Object
   # currently rather verbose, but will attempt to describe all it knows about a method
   def method_desc name
