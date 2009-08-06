@@ -1,6 +1,7 @@
 Gem::Specification.new do |s|
   s.name = %q{method_describer}
-  s.version = "0.0.4"
+  s.version = "0.0.5"
+  # 0.0.5 Attempt to handle class methods, as well
  
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.]}
@@ -11,6 +12,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<rdoc>, [">= 2.3"])
   s.add_dependency(%q<require_all>, [">= 1.1"])
   s.add_dependency(%q<rogerdpack-arguments>)
+  s.add_dependency(%q<rogerdpack-sane>)
   s.add_dependency(%q<ParseTree>) # for 1.8 only
      
 end

@@ -2,6 +2,7 @@
 require 'rubygems'
 require 'rdoc'
 require 'rdoc/ri/driver'
+require 'sane'
 begin
   gem 'arguments' # TODO why is this necessary?
   require 'arguments' # rogerdpack-arguments
@@ -19,27 +20,32 @@ module SourceLocationDesc
 
     # to_s is something like "#<Method: String#strip>"
     # or #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
+    # or "#<Method: A.go>"
     string = to_s
 
     if string.include? '('
       # case #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
       string =~ /\((.*)\)/ # extract out what is between parentheses for the classname
       class_name = $1
+    elsif string =~ /Method: (.*)\..*>/
+      # case "#<Method: A.go>"
+      class_name = $1
     else
       # case "#<Method: String#strip>"
-      string =~ /Method: (.*)#>/
+      string =~ /Method: (.*)#.*/
       class_name = $1
     end
 
     string =~ /Method: .*#(.*)>/
     method_name = $1
     full_name = "#{class_name}##{method_name}"
+    doc << full_name
 
     # now run default RI for it
     begin
       puts 'ri for ' + full_name
       RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
-    rescue SystemExit
+    rescue *[StandardError, SystemExit]
       # not found
     end
 
@@ -49,14 +55,16 @@ module SourceLocationDesc
     if !(respond_to? :source_location)
       # pull out names for 1.8
       begin
-        args = Arguments.names( eval(class_name), method_name)
-        doc << "parameters:" + args.join(',')
+        klass = eval(class_name)
+        args = Arguments.names( klass, method_name) rescue Arguments.names(klass.singleton_class, method_name)
         return args if want_just_summary
+        doc << "parameters:" + args.join(',')
       rescue Exception => e
-        puts "please install the ParseTree gem #{e}"
+        puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $VERBOSE
       end
     else
       file, line = source_location
+      doc << source_location
       if file
         # then it's a pure ruby method
         head_and_sig = File.readlines(file)[0...line]
@@ -70,7 +78,7 @@ module SourceLocationDesc
         end
         return sig + "\n" + head[0] if want_just_summary
       else
-        doc << 'appears to be a binary method (c)'
+        doc << 'appears to be a binary method (c)--no ruby source_location'
       end
     end
 
@@ -99,7 +107,7 @@ class Object
   def method_desc name
     if self.is_a? Class
       # i.e. String.strip
-      instance_method(name).desc
+      instance_method(name).desc rescue method(name).desc # allow for Class.instance_method_name I suppose
     else
       method(name).desc
     end
@@ -119,5 +127,15 @@ and arity
 =>  ["arity: -1"]
 
 # todo: one that is guaranteed to exit you early [no docs at all ever]
+
+wurx with class methods
+>> class A; def self.go(a = 3)
+   end; end
+>> class A; def go2(a=4)
+   end; end
+>> A.desc_method(:go)
+>> A.desc_method(:go2)
+
+
 
 =end

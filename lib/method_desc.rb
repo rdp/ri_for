@@ -1,3 +1,3 @@
 require 'rubygems'
-require 'require_all'
+require 'sane'
 require_rel 'method_describer'
