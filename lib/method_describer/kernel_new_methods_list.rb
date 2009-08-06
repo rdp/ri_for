@@ -18,6 +18,3 @@ if $0 == __FILE__
   puts 'A.methods', A.methods(true).inspect, A.methods(false).inspect
   puts 'A.new.methods', A.new.methods.inspect
 end
-
-
-

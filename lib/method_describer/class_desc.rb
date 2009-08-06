@@ -8,11 +8,18 @@ class Object
     rescue SystemExit
       # not found
     end
+
+    class_methods = methods(false)
+    for ancestor in ancestors[1..-1] # skip the first one, which is yourself
+      class_methods -= ancestor.methods(false)
+    end
+
     doc = []
     doc << ''
     doc += ["non inherited methods:", instance_methods(false).sort.join(", ")]
-    doc << "non common ancestors:" + (ancestors - String.ancestors).join(', ')
-    doc << "constants (possible sub classes):" + constants.join(', ') if constants.length > 0
+    doc += ['non inherited class methods:', class_methods.sort.join(', ')]
+    doc += ["ancestors:", ancestors.join(', ')]
+    doc += ["Constants (possible sub classes):",  constants.join(', ')] if constants.length > 0
     puts doc
     doc if return_stuff
   end

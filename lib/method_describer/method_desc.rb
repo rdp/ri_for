@@ -22,25 +22,31 @@ module SourceLocationDesc
     # to_s is something like "#<Method: String#strip>"
     # or #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
     # or "#<Method: A.go>"
-    string = to_s
-    joiner = '#'
+    # or "#<Method: Order(id: integer, order_number: integer, created_on: datetime, shipped_on: datetime, order_user_id: integer, order_status_code_id: integer, notes: text, referer: string, order_shipping_type_id: integer, product_cost: float, shipping_cost: float, tax: float, auth_transaction_id: string, promotion_id: integer, shipping_address_id: integer, billing_address_id: integer, order_account_id: integer).get_cc_processor>"
 
-    if string.include? '('
+    string = to_s
+
+    if string.include? ')#'
       # case #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
       string =~ /\((.*)\)/ # extract out what is between parentheses for the classname
+      class_name = $1
+    elsif string.include?( '(' ) && string.include?( ').' )
+      # case "Method: Order(id:...).class_method"
+      string =~ /Method: (.*)\(/
       class_name = $1
     elsif string =~ /Method: (.*)\..*>/
       # case "#<Method: A.go>"
       class_name = $1
-      joiner = '.'
     else
       # case "#<Method: String#strip>"
       string =~ /Method: (.*)#.*/
       class_name = $1
     end
 
-    string =~ /Method: .*[#\.](.*)>/
-    method_name = $1
+    # now get method name, type
+    string =~ /Method: .*([#\.])(.*)>/ # include the # or .
+    joiner = $1
+    method_name = $2
     full_name = "#{class_name}#{joiner}#{method_name}"
 
     # now run default RI for it
@@ -131,7 +137,7 @@ class Object
   def method_desc name, options = {}
     if self.is_a? Class
       # i.e. String.strip
-      instance_method(name).desc(options) # rescue method(name).desc # allow for Class.instance_method_name I suppose
+      instance_method(name).desc(options) rescue method(name).desc # allow for Class.instance_method_name
     else
       method(name).desc(options)
     end
