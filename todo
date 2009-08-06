@@ -1,15 +1,11 @@
-add lean version [?] -- non lean could have full methods, too
+I don't think we handle Class.name RI yet... (?)
 
 remote ri
+can we pull from trans' webri?
 
-class could look for descriptions above where its methods 
-
-somehow figure out that String includes comparable
+somehow figure out that String includes comparable do we need to tho?
 
 class could display one liners per method, too...
 
-display full code for 1.8, and in 1.9 (from the source files)
+display full code for 1.9 (from the source files)
 
-for contants can even put what they are [...]?
-
-can we pull from trans' webri?

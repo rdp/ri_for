@@ -1,6 +1,8 @@
 Gem::Specification.new do |s|
   s.name = %q{method_describer}
-  s.version = "0.0.5"
+  s.version = "0.0.6"
+
+  # 0.0.6 same, add source almost.
 
   # 0.0.5 Attempt to handle class methods, as well
  
@@ -15,5 +17,5 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<rogerdpack-arguments>)
   s.add_dependency(%q<rogerdpack-sane>, ['>= 0.1.2'])
   s.add_dependency(%q<ParseTree>) # for 1.8 only
-     
+  s.add_dependency(%q<ruby2ruby>) # 1.8 again
 end
