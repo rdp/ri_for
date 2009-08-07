@@ -53,27 +53,29 @@ module SourceLocationDesc
     begin
       puts 'ri for ' + full_name
       RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
+      puts '(end ri)'
     rescue *[StandardError, SystemExit]
       # not found
     end
 
     # now gather up any other information we now about it, in case there are no rdocs
+    doc += [to_s, "arity: #{arity}"]
 
     if !(respond_to? :source_location)
       # pull out names for 1.8
       begin
         klass = eval(class_name)
         args = Arguments.names( klass, method_name) rescue Arguments.names(klass.singleton_class, method_name)
-	out = []
-	args.each{|arg_pair|
-	  out << arg_pair.join(' = ')
-	}
-	out = out.join(',')
-	return out if want_just_summary
-	
+        out = []
+        args.each{|arg_pair|
+          out << arg_pair.join(' = ')
+        }
+        out = out.join(',')
+        return out if want_just_summary
+
         doc << "#{full_name} " + out
         if joiner == '#'
-  	  doc << to_ruby
+          doc << to_ruby
         else
           # overcome ruby2ruby bug, at least with 1.9.x
           doc << RubyToRuby.new.process(ParseTree.translate(klass.singleton_class, method_name))
@@ -87,43 +89,41 @@ module SourceLocationDesc
       doc << source_location
       if file
         # then it's a pure ruby method
-	all_lines = File.readlines(file)
+        all_lines = File.readlines(file)
         head_and_sig = all_lines[0...line]
         sig = head_and_sig[-1]
         head = head_and_sig[0..-2]
 
-        # needs more sophistication, but well... :)
+        doc << sig
         head.reverse_each do |line|
           break unless line =~ /^\s*#(.*)/
           doc.unshift "     " + $1.strip
         end
-	doc << sig
 
         # now the real code will end with 'end' same whitespace as the first
-	sig_white_space = sig.scan(/\W+/)[0]
-	body = all_lines[line..-1]
-	body.each{|line|
-	  doc << line
-	  if line.start_with?(sig_white_space + "end")
-	   break
-	  end
-	}
-	# how do I get the rest now?
+        sig_white_space = sig.scan(/\W+/)[0]
+        body = all_lines[line..-1]
+        body.each{|line|
+          doc << line
+          if line.start_with?(sig_white_space + "end")
+            break
+          end
+        }
+        # how do I get the rest now?
         return sig + "\n" + head[0] if want_just_summary
       else
         doc << 'appears to be a c method'
       end
-      doc << full_name
     end
 
     if respond_to? :parameters
-      prog_sig = "Signature from #parameters: %s %p" % [name, parameters]
       orig_sig = "Original code signature: %s" % sig.to_s.strip
+      prog_sig = "Signature from #parameters: %s %p" % [name, parameters]
       doc = [prog_sig, orig_sig, ''] + doc
     end
-    # put arity at the end
-    doc += [to_s, "arity: #{arity}"]
-    puts doc # always output it since RI does currently [todo make optional I suppose]
+
+    puts doc # always output it since RI does currently [todo make optional I suppose, and non out-putty]
+
     doc if want_the_description_returned # give them something they can examine
   end
 
