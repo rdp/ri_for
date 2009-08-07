@@ -72,7 +72,11 @@ module SourceLocationDesc
 	return out if want_just_summary
 	
         doc << "#{full_name} " + out
-	doc << to_ruby rescue nil # TODO doesn't work for class methods currently...yeah.
+        if joiner == '#'
+  	  doc << to_ruby
+        else
+          doc << RubyToRuby.new.process(ParseTree.translate(klass.singleton_class, method_name))
+        end
       rescue Exception => e
         puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $VERBOSE
       end
@@ -97,14 +101,13 @@ module SourceLocationDesc
         # now the real code will end with 'end' same whitespace as the first
 	sig_white_space = sig.scan(/\W+/)[0]
 	body = all_lines[line..-1]
-	all_lines.each{|line|
+	body.each{|line|
 	  doc << line
 	  if line.start_with?(sig_white_space + "end")
 	   break
 	  end
 	}
 	# how do I get the rest now?
-	
         return sig + "\n" + head[0] if want_just_summary
       else
         doc << 'appears to be a c method'

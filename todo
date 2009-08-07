@@ -1,11 +1,8 @@
-I don't think we handle Class.name RI yet... (?)
-
-remote ri
-can we pull from trans' webri?
+remote-remote ri [?]
+can we just pull from trans' webri?
 
 somehow figure out that String includes comparable do we need to tho?
 
-class could display one liners per method, too...
+class could display one liners per method, too, in the class desc...
 
-display full code for 1.9 (from the source files)
-
+add full class code for 1.8...maybe just one liners? :)

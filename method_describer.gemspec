@@ -1,11 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{method_describer}
-  s.version = "0.0.6"
-
-  # 0.0.6 same, add source almost.
-
-  # 0.0.5 Attempt to handle class methods, as well
- 
+  s.version = "0.0.7"
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.]}
   s.email = ["rogerdpack@gmail.comm"]
@@ -20,3 +15,9 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<ParseTree>) # for 1.8 only
   s.add_dependency(%q<ruby2ruby>) # 1.8 again
 end
+
+  # 0.0.7 fix bugs in display source for class methods, add test [we have tests now!]
+  # 0.0.6 same, add source almost.
+  # 0.0.5 Attempt to handle class methods, as well
+ 
+
