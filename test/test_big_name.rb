@@ -23,12 +23,12 @@ end
 doctest: should parse funky inspect classes [railsy], too
 
 doctest_require: '../lib/method_desc'
->> A.desc_method(:go, :want_output => true).join('..')
->> A.desc_method(:go2, :want_output => true).join('..')
->> B.desc_method(:go2, :want_output => true).join('..').include?('35')
+>> A.desc_method(:go, :want_the_description_returned => true).join('..')
+>> A.desc_method(:go2, :want_the_description_returned => true).join('..')
+>> B.desc_method(:go2, :want_the_description_returned => true).join('..').include?('35')
 => true
->> RUBY_VERSION < '1.9' || A.desc_method(:go2, :want_output => true).join('..').include?('suh-weet rdoc')
+>> RUBY_VERSION < '1.9' || A.desc_method(:go2, :want_the_description_returned => true).join('..').include?('suh-weet rdoc')
 => true
->> A.desc_method(:go2, :want_output => true).join('..').include? 'never be shown'
+>> A.desc_method(:go2, :want_the_description_returned => true).join('..').include? 'never be shown'
 => false
 =end 

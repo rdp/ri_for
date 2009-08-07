@@ -16,7 +16,7 @@ module SourceLocationDesc
   # add a Method#desc which spits out all it knows about that method
   # ri, location, local ri, etc.
   # TODO does this work with class methods?
-  def desc want_just_summary = false
+  def desc want_just_summary = false, want_the_description_returned = false
     doc = []
 
     # to_s is something like "#<Method: String#strip>"
@@ -75,6 +75,7 @@ module SourceLocationDesc
         if joiner == '#'
   	  doc << to_ruby
         else
+          # overcome ruby2ruby bug, at least with 1.9.x
           doc << RubyToRuby.new.process(ParseTree.translate(klass.singleton_class, method_name))
         end
       rescue Exception => e
@@ -122,9 +123,8 @@ module SourceLocationDesc
     end
     # put arity at the end
     doc += [to_s, "arity: #{arity}"]
-    puts doc # always output it since RI does currently [todo]
-
-    doc # give them something they can examine
+    puts doc # always output it since RI does currently [todo make optional I suppose]
+    doc if want_the_description_returned # give them something they can examine
   end
 
   named_args_for :desc # just for fun, tests use it too, plus it should actually wurk without interfering...I think
@@ -140,7 +140,7 @@ class Object
   def method_desc name, options = {}
     if self.is_a? Class
       # i.e. String.strip
-      instance_method(name).desc(options) rescue method(name).desc # allow for Class.instance_method_name
+      instance_method(name).desc(options) rescue method(name).desc(options) # rescue allows for Class.instance_method_name
     else
       method(name).desc(options)
     end
@@ -155,11 +155,11 @@ end
 doctest:
 >> require 'pathname'
 it should display the name
->> Pathname.instance_method(:children).desc(:want_output => true).grep(/children/).size > 0
+>> Pathname.instance_method(:children).desc(:want_the_description_returned => true).grep(/children/).size > 0
 =>  true # ["#<UnboundMethod: Pathname#children>"]
 
 and arity
->> Pathname.instance_method(:children).desc(:want_output => true).grep(/arity/)
+>> Pathname.instance_method(:children).desc(:want_the_description_returned => true).grep(/arity/)
 =>  ["arity: -1"]
 
 # todo: one that is guaranteed to exit you early [no docs at all ever]
