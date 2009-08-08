@@ -59,7 +59,7 @@ module SourceLocationDesc
     end
 
     # now gather up any other information we now about it, in case there are no rdocs
-    doc += [to_s, "arity: #{arity}"]
+    doc += ["#{to_s}     arity: #{arity}"]
 
     if !(respond_to? :source_location)
       # pull out names for 1.8
@@ -86,7 +86,7 @@ module SourceLocationDesc
     else
       # 1.9.x
       file, line = source_location
-      doc << source_location
+      doc << "at #{file}:#{line}"
       if file
         # then it's a pure ruby method
         all_lines = File.readlines(file)
@@ -117,9 +117,8 @@ module SourceLocationDesc
     end
 
     if respond_to? :parameters
-      orig_sig = "Original code signature: %s" % sig.to_s.strip
-      prog_sig = "Signature from #parameters: %s %p" % [name, parameters]
-      doc = [prog_sig, orig_sig, ''] + doc
+      doc << "Original code signature: %s" % sig.to_s.strip
+      doc << "#parameters signature: %s( %p )" % [name, parameters]
     end
 
     puts doc # always output it since RI does currently [todo make optional I suppose, and non out-putty]
