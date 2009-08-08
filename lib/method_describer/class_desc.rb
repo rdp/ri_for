@@ -4,8 +4,9 @@ class Class
   def desc_class options = {}
     # want_output = false, verbose = false
     begin
-      puts "RI for #{to_s}"
+      puts "begin RI"
       RDoc::RI::Driver.run [to_s, '--no-pager']
+      puts 'end ri'
     rescue SystemExit
       # not found
     end
@@ -16,10 +17,10 @@ class Class
     end
 
     doc = []
-    doc << ''
+    doc << to_s
     doc += ["non inherited methods:", instance_methods(false).sort.join(", ")]
     doc += ['non inherited class methods:', class_methods.sort.join(', ')]
-    doc += ["ancestors:", ancestors.join(', ')]
+    doc += ["ancestors:", ancestors.join(', ')] if options[:verbose]
     doc += ["Constants (possible sub classes):",  constants.join(', ')] if constants.length > 0 && options[:verbose]
     puts doc
     doc if options[:want_output]
