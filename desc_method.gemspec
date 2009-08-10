@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{desc_method}
-  s.version = "0.0.9"
+  s.version = "0.1.0"
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.] at runtime}
   s.email = ["rogerdpack@gmail.comm"]
@@ -16,9 +16,9 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<ruby2ruby>)
 end
 
+# 0.1.0 First release yea!
 # 0.0.8 add class_desc, and make less verbose
 # 0.0.7 fix bugs in display source for class methods, add test [we have tests now!]
 # 0.0.6 same, add source almost.
 # 0.0.5 Attempt to handle class methods, as well
  
-

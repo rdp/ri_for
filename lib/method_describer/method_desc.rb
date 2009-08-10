@@ -133,10 +133,10 @@ end
 class Method; include SourceLocationDesc; end
 class UnboundMethod; include SourceLocationDesc; end
 
-# TODO mixin a separate module
+# TODO mixin from a separate module
 class Object
   # currently rather verbose, but will attempt to describe all it knows about a method
-  def method_desc name, options = {}
+  def desc_method name, options = {}
     if self.is_a? Class
       # i.e. String.strip
       instance_method(name).desc(options) rescue method(name).desc(options) # rescue allows for Class.instance_method_name
@@ -144,10 +144,7 @@ class Object
       method(name).desc(options)
     end
   end
-  alias :desc_method :method_desc # you can have it either way
 end
-
-
 
 
 =begin 
