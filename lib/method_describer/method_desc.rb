@@ -53,10 +53,10 @@ module SourceLocationDesc
     begin
       puts 'ri for ' + full_name
       RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
-      puts '(end ri)'
     rescue *[StandardError, SystemExit]
       # not found
     end
+    puts '(end ri)'
 
     # now gather up any other information we now about it, in case there are no rdocs
     doc += ["#{to_s}     arity: #{arity}"]
