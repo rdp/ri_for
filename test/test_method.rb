@@ -11,7 +11,12 @@ end
 =begin
 doctest_require: '../lib/desc_method'
 >> output = A.desc_method(:go, :want_the_description_returned => true).join(' ')
->> puts output
+>> output.include? 'a = 33'
+=> true
+>> RUBY_VERSION < '1.9' || output.include?('suh-weet')
+=> true
+
+>> output = A.new.desc_method(:go, :want_the_description_returned => true).join(' ')
 >> output.include? 'a = 33'
 => true
 >> RUBY_VERSION < '1.9' || output.include?('suh-weet')
