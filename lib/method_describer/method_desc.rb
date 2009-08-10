@@ -159,7 +159,7 @@ it should display the name
 
 and arity
 >> Pathname.instance_method(:children).desc(:want_the_description_returned => true).grep(/arity/)
-=>  ["arity: -1"]
+=> ["#<UnboundMethod: Pathname#children>     arity: -1"]
 
 # todo: one that is guaranteed to exit you early [no docs at all ever]
 

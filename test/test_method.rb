@@ -6,10 +6,11 @@ class A
 end
 =begin
 doctest_require: '../lib/method_desc'
->> output = A.desc_method(:go, :want_output => true).join('..')
+>> output = A.desc_method(:go, :want_the_description_returned => true).join(' ')
+>> puts output
 >> output.include? 'a = 33'
 => true
->> output.include? 'suh-weet'
+>> RUBY_VERSION < '1.9' || output.include?('suh-weet')
 => true
 
 =end
