@@ -1,33 +1,65 @@
-Some helpers so that introspecting methods from irb is *much* nicer.
+A "method describer"--this gem adds a #desc_method method--you pass it a method name, it reveals everything conceivably known about that method.  This includes source, ri, arity, rdoc comments (on 1.9), etc.
 
-How to use:
+For me this is quite useful during ruby-debug sessions, and I wouldn't leave home without it [try it--you might really like it].
 
-'string'.desc :strip
-or
-String.method_desc :strip
-or
-String.method(:strip).desc
+Examples:
+1.8:
 
-TODO a real example
+ class A; 
+    def go(a); end; 
+  end
+>> A.desc_method :go
+ri for A#go
+Nothing known about A
+(end ri)
+#<UnboundMethod: A#go>     arity: 1
+A#go a
+proc { |a|
+  # do nothing
+}
 
-How to install (sorry it's by hand currently_
+a 1.9 example
+irb
+>> File.desc_method :delete
+ri for File.delete
+----------------------------------------------------------- File::delete
+     File.delete(file_name, ...)  => integer
+     File.unlink(file_name, ...)  => integer
 
-gem install rogerdpack-method_descriptor
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Deletes the named files, returning the number of names passed as
+     arguments. Raises an exception on any error. See also +Dir::rmdir+.
 
+(end ri)
+#<Method: File.delete>     arity: -1
+at :
+appears to be a c method
+Original code signature:
+#parameters signature: delete( [[:rest]] )
 
-If you don't have the ri files for core [i.e. running "ri File" fails to return anything useful] then you're kind of stuck--you could request them from your package maintainer.
+========= Installation/usage:=====
+$ gem install rogerdpack-desc_method
+>> require 'desc_method'
+>> Class.desc_method :instance_or_class_method_name
+...
+>> instance.desc_method :instance_method_name
+...
 
-If you have not built them for your gems, you can easily:
+other goodies also included:
+Class.desc_class # outputs descriptive information about that class--ex:
+Object.desc_class
+# outputs RI, method lists
+Object.desc_class :verbose => true
+# outputs RI, method lists including inherited methods, ancestors.
 
-gem rdoc --all --ri
+Kernel#method is monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
+>> method
+=> [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method]
 
-Also, if your methods are built at run-time [i.e. meta programming] like
+1.8 and 1.9 compatible.
 
-a.class_eval "
-# a method
-def go
- end
-end
-"
+This gem wraps (in a very convenient way) functionality provided by Method#source_location, ruby2ruby, etc. Also thanks to manvenu for some original code inspiration, SourceRef (MBARI), and ruby-debug, who made this possible. Thanks guys!
 
-You could still access rdoc style descriptions by using the remembered_evals gem.
+Enjoy.
+Comments welcome rogerdpack on github

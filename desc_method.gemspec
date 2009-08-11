@@ -2,9 +2,9 @@ Gem::Specification.new do |s|
   s.name = %q{desc_method}
   s.version = "0.1.0"
   s.authors = ["Roger Pack"]
-  s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.] at runtime}
+  s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.] at runtime, for example while debugging.}
   s.email = ["rogerdpack@gmail.comm"]
-  s.files = ["lib/desc_method.rb", "lib/method_describer/class_desc.rb", "lib/method_describer/kernel_new_methods_list.rb", "lib/method_describer/method_desc.rb"]
+  s.files = ["README", "lib/desc_method.rb", "lib/method_describer/class_desc.rb", "lib/method_describer/kernel_new_methods_list.rb", "lib/method_describer/method_desc.rb"]
   s.require_paths = ['lib']
 
   s.homepage = %q{http://github.com/rogerdpack/method_describer}
