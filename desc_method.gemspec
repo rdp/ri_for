@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{desc_method}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.] at runtime, for example while debugging.}
   s.email = ["rogerdpack@gmail.comm"]
