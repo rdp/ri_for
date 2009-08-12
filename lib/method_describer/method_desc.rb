@@ -86,9 +86,9 @@ module SourceLocationDesc
     else
       # 1.9.x
       file, line = source_location
-      doc << "at #{file}:#{line}"
       if file
         # then it's a pure ruby method
+        doc << "at #{file}:#{line}"
         all_lines = File.readlines(file)
         head_and_sig = all_lines[0...line]
         sig = head_and_sig[-1]
@@ -117,7 +117,7 @@ module SourceLocationDesc
     end
 
     if respond_to? :parameters
-      doc << "Original code signature: %s" % sig.to_s.strip
+      doc << "Original code signature: %s" % sig.to_s.strip if sig
       doc << "#parameters signature: %s( %p )" % [name, parameters]
     end
 

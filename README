@@ -1,14 +1,14 @@
-A "method describer"--this gem adds a #desc_method method--you pass it a method name, it reveals everything conceivably known about that method.  This includes source, ri, arity, rdoc comments (on 1.9), etc.
+A "ruby method describer"--this gem allows you to introspect methods while within irb or ruby-debug.  It reveals everything conceivably known about that method.  This includes source, ri, arity, rdoc comments (on 1.9), etc. etc.
 
-For me this is quite useful during ruby-debug sessions, and I wouldn't leave home without it [try it--you might really like it].
+For me it has proved quite useful, and I wouldn't leave home without it [try it--you might really like it].
 
 Examples:
-1.8:
-
+>>
  class A; 
     def go(a); end; 
   end
 >> A.desc_method :go
+   # it outputs everything it knows about it...arity, source, RI, etc.
 ri for A#go
 Nothing known about A
 (end ri)
@@ -18,8 +18,7 @@ proc { |a|
   # do nothing
 }
 
-a 1.9 example
-irb
+an example in 1.9:
 >> File.desc_method :delete
 ri for File.delete
 ----------------------------------------------------------- File::delete
@@ -33,33 +32,32 @@ ri for File.delete
 
 (end ri)
 #<Method: File.delete>     arity: -1
-at :
 appears to be a c method
-Original code signature:
 #parameters signature: delete( [[:rest]] )
 
 ========= Installation/usage:=====
+Installation:
 $ gem install rogerdpack-desc_method
+Usage:
 >> require 'desc_method'
->> Class.desc_method :instance_or_class_method_name
+>> Class.desc_method :method_name # class or instance method name
 ...
 >> instance.desc_method :instance_method_name
 ...
 
 other goodies also included:
-Class.desc_class # outputs descriptive information about that class--ex:
-Object.desc_class
-# outputs RI, method lists
-Object.desc_class :verbose => true
-# outputs RI, method lists including inherited methods, ancestors.
+Class.desc_class  method # outputs descriptive information about that class--ex:
+>> Object.desc_class
+# outputs RI, methods, etc.
+or 
+>> Object.desc_class :verbose => true
+# outputs RI, method lists including inherited methods, ancestors, constants
 
 Kernel#method is monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
 >> method
-=> [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method]
+=> [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method] # adds in the separator
 
-1.8 and 1.9 compatible.
 
 This gem wraps (in a very convenient way) functionality provided by Method#source_location, ruby2ruby, etc. Also thanks to manvenu for some original code inspiration, SourceRef (MBARI), and ruby-debug, who made this possible. Thanks guys!
 
-Enjoy.
-Comments welcome rogerdpack on github
+Comments/suggestions welcome rogerdpack on gmail or github

@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<ruby2ruby>)
 end
 
+# 0.1.1 minor cleanups on 1.9 [for release]
 # 0.1.0 First release yea!
 # 0.0.8 add class_desc, and make less verbose
 # 0.0.7 fix bugs in display source for class methods, add test [we have tests now!]
