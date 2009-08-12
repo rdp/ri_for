@@ -48,6 +48,7 @@ module SourceLocationDesc
     joiner = $1
     method_name = $2
     full_name = "#{class_name}#{joiner}#{method_name}"
+    puts "#{to_s}      arity: #{arity}" # TODO add to doc, I want it before ri for now though :)
 
     # now run default RI for it
     begin
@@ -59,27 +60,26 @@ module SourceLocationDesc
     puts '(end ri)'
 
     # now gather up any other information we now about it, in case there are no rdocs
-    doc += ["#{to_s}     arity: #{arity}"]
 
     if !(respond_to? :source_location)
       # pull out names for 1.8
       begin
         klass = eval(class_name)
+        # we don't call to_ruby to overcome ruby2ruby bug http://rubyforge.org/tracker/index.php?func=detail&aid=26891&group_id=1513&atid=5921
+        if joiner == '#'
+          doc << RubyToRuby.new.process(ParseTree.translate(klass, method_name))
+        else
+          doc << RubyToRuby.new.process(ParseTree.translate(klass.singleton_class, method_name))
+        end
         args = Arguments.names( klass, method_name) rescue Arguments.names(klass.singleton_class, method_name)
         out = []
         args.each{|arg_pair|
           out << arg_pair.join(' = ')
         }
-        out = out.join(',')
+        out = out.join(', ')
         return out if want_just_summary
 
-        doc << "#{full_name} " + out
-        if joiner == '#'
-          doc << to_ruby
-        else
-          # overcome ruby2ruby bug, at least with 1.9.x
-          doc << RubyToRuby.new.process(ParseTree.translate(klass.singleton_class, method_name))
-        end
+        doc << "Parameters: #{method_name}(" + out + ")"
       rescue Exception => e
         puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $VERBOSE
       end
@@ -114,11 +114,10 @@ module SourceLocationDesc
       else
         doc << 'appears to be a c method'
       end
-    end
-
-    if respond_to? :parameters
-      doc << "Original code signature: %s" % sig.to_s.strip if sig
-      doc << "#parameters signature: %s( %p )" % [name, parameters]
+      if respond_to? :parameters
+        doc << "Original code signature: %s" % sig.to_s.strip if sig
+        doc << "#parameters signature: %s( %p )" % [name, parameters]
+      end
     end
 
     puts doc # always output it since RI does currently [todo make optional I suppose, and non out-putty]
