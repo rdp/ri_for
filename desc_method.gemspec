@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{desc_method}
-  s.version = "0.1.2"
+  s.version = "0.1.3"
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.] at runtime, for example while debugging.}
   s.email = ["rogerdpack@gmail.comm"]
@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<ruby2ruby>)
 end
 
+# 0.1.3 return something useful instead of nil
 # 0.1.2 fix bug
 # 0.1.1 minor cleanups on 1.9 [for release]
 # 0.1.0 First release yea!

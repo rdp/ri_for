@@ -1,24 +1,21 @@
-A "ruby method describer"--this gem allows you to introspect methods while within irb or ruby-debug.  It reveals everything conceivably known about that method.  This includes source, ri, arity, rdoc comments (on 1.9), etc. etc.
+A "run time RI for ruby methods", this gem allows you to inspect objects' methods while within irb or ruby-debug.  It reveals everything known about the method in question.  This includes source, ri, arity, rdoc comments (on 1.9), etc. where available 
 
-For me it has proved quite useful, and I wouldn't leave home without it [try it--you might really like it].
+For me it has proved quite useful, and I wouldn't do a ruby-debug session without it--try it--you might really like it.
 
-Examples:
->>
- class A; 
+irb examples:
+>> class A; 
     def go(a); end; 
-  end
+   end
 >> A.desc_method :go
-   # it outputs everything it knows about it...arity, source, RI, etc.
+#<UnboundMethod: A#go>      arity: 1
 ri for A#go
 Nothing known about A
 (end ri)
-#<UnboundMethod: A#go>     arity: 1
-A#go a
-proc { |a|
+def go(a)
   # do nothing
-}
+end
+Parameters: go(a)
 
-an example in 1.9:
 >> File.desc_method :delete
 ri for File.delete
 ----------------------------------------------------------- File::delete
@@ -35,6 +32,37 @@ ri for File.delete
 appears to be a c method
 #parameters signature: delete( [[:rest]] )
 
+
+Or my favorite, using it in debug sessions:
+(rdb:1) l=
+...
+=> 74       assert(assigns['order'].order_line_items.map(:unit_price).min >= -5)
+...
+(rdb:1) desc_method :assert
+#<Method: StoreControllerTest(Test::Unit::Assertions)#assert>      arity: -2
+ri for Test::Unit::Assertions#assert
+------------------------------------------ Test::Unit::Assertions#assert
+     assert(boolean, message=nil)
+
+     From gem test-unit-2.0.1
+------------------------------------------------------------------------
+     Asserts that +boolean+ is not false or nil.
+
+     Example:
+
+       assert [1, 2].include?(5)
+
+(end ri)
+def assert(boolean, message = nil)
+  _wrap_assertion do
+    assert_block("assert should not be called with a block.") do
+      (not block_given?)
+    end
+    assert_block(build_message(message, "<?> is not true.", boolean)) { boolean }
+  end
+end
+Parameters: assert(boolean, message = nil)
+
 ========= Installation/usage:=====
 Installation:
 $ gem install rogerdpack-desc_method
@@ -45,19 +73,18 @@ Usage:
 >> instance.desc_method :instance_method_name
 ...
 
-other goodies also included:
-Class.desc_class  method # outputs descriptive information about that class--ex:
+Other goodies also included:
+Class#desc_class
 >> Object.desc_class
-# outputs RI, methods, etc.
-or 
+# outputs descriptive info about that class--RI, methods, etc.
 >> Object.desc_class :verbose => true
 # outputs RI, method lists including inherited methods, ancestors, constants
 
-Kernel#method is monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
->> method
-=> [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method] # adds in the separator
+Kernel#methods is also monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
+>> instance.methods
+=> [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method] # adds in that separator
 
-
-This gem wraps (in a very convenient way) functionality provided by Method#source_location, ruby2ruby, etc. Also thanks to manvenu for some original code inspiration, SourceRef (MBARI), and ruby-debug, who made this possible. Thanks guys!
+=== Thanks ===
+This gem wraps functionality of Method#source_location, ruby2ruby, et al, and also some from manvenu, SourceRef (MBARI), and also would not be useful without ruby-debug and all the core guys. Thank you.
 
 Comments/suggestions welcome rogerdpack on gmail or github

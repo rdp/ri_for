@@ -25,4 +25,10 @@ doctest_require: '../lib/desc_method'
 >> output = A.desc_method(:go2, :want_the_description_returned => true).join(' ')
 >> output.include? 'b = 3'
 => true
+
+it should return you something useful
+>> A.desc_method(:go2) == nil
+=> false
+>> A.desc_method(:go) == nil
+=> false
 =end

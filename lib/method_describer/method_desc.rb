@@ -122,7 +122,11 @@ module SourceLocationDesc
 
     puts doc # always output it since RI does currently [todo make optional I suppose, and non out-putty]
 
-    doc if want_the_description_returned # give them something they can examine
+    if want_the_description_returned # give them something they can examine
+       doc
+    else
+       self
+    end
   end
 
   named_args_for :desc # just for fun, tests use it too, plus it should actually wurk without interfering...I think
