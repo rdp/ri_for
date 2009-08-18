@@ -1,8 +1,8 @@
-A "run time RI for ruby methods", this gem allows you to inspect objects' methods while within irb or ruby-debug.  It reveals everything known about the method in question.  This includes source, ri, arity, rdoc comments (on 1.9), etc. where available 
+A "run time RI for ruby methods", this gem allows you to query for information about objects' methods within irb or a ruby-debug prompt.  It reveals everything known about the method.  This includes source, ri, arity, rdoc comments (on 1.9), etc. where available 
 
 For me it has proved quite useful, and I wouldn't do a ruby-debug session without it--try it--you might really like it.
 
-irb examples:
+Examples:
 >> class A; 
     def go(a); end; 
    end
@@ -15,7 +15,6 @@ def go(a)
   # do nothing
 end
 Parameters: go(a)
-
 >> File.desc_method :delete
 ri for File.delete
 ----------------------------------------------------------- File::delete
@@ -33,7 +32,7 @@ appears to be a c method
 #parameters signature: delete( [[:rest]] )
 
 
-Or my favorite, using it in debug sessions:
+Or (my favorite) using it in a debug session:
 (rdb:1) l=
 ...
 => 74       assert(assigns['order'].order_line_items.map(:unit_price).min >= -5)
@@ -62,29 +61,38 @@ def assert(boolean, message = nil)
   end
 end
 Parameters: assert(boolean, message = nil)
+(rdb:1)
 
-========= Installation/usage:=====
-Installation:
-$ gem install rogerdpack-desc_method
+========= How to Install=====
+$ gem install rogerdpack-desc_method 
+or
+$ gem install rogerdpack-desc_method --source http://gems.github.com 
+if you don't have gems.github.com as a gem source.
+
 Usage:
 >> require 'desc_method'
 >> Class.desc_method :method_name # class or instance method name
 ...
->> instance.desc_method :instance_method_name
+>> some_object.desc_method :method_name
 ...
 
 Other goodies also included:
 Class#desc_class
->> Object.desc_class
-# outputs descriptive info about that class--RI, methods, etc.
->> Object.desc_class :verbose => true
-# outputs RI, method lists including inherited methods, ancestors, constants
 
-Kernel#methods is also monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
+Examples:
+>> Object.desc_class
+# outputs descriptive info about that class--RI, method list, etc.
+>> Object.desc_class :verbose => true
+# outputs RI, method lists including inherited methods, ancestors, all constants etc.
+
+Kernel#methods 
+This has been monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
 >> instance.methods
 => [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method] # adds in that separator
 
+Though I'll probably remove that in a future release since it turns out you can just run Kernel#methods(false) for about as much usefulness.
+
 === Thanks ===
-This gem wraps functionality of Method#source_location, ruby2ruby, et al, and also some from manvenu, SourceRef (MBARI), and also would not be useful without ruby-debug and all the core guys. Thank you.
+This gem wraps for convenience the functionality of Method#source_location, ruby2ruby, et al, and also contains some code inspiration from manvenu, SourceRef (MBARI), and Python's Method#desc.  It also wouldn't be useful without irb and the ruby-debug folks. Thanks!
 
 Comments/suggestions welcome rogerdpack on gmail or github
