@@ -48,11 +48,12 @@ module SourceLocationDesc
     joiner = $1
     method_name = $2
     full_name = "#{class_name}#{joiner}#{method_name}"
-    puts "#{to_s}      arity: #{arity}" # TODO add to doc, I want it before ri for now though :)
+    puts "#{to_s}      arity: #{arity}" 
+    # TODO add to doc, I want it before ri for now though, and only once, so not there yet :)
 
     # now run default RI for it
     begin
-      puts 'ri for ' + full_name
+      puts 'searching ri for ' + full_name + "..."
       RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
     rescue *[StandardError, SystemExit]
       # not found
