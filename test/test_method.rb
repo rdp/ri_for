@@ -10,6 +10,7 @@ class A
 end
 =begin
 doctest_require: '../lib/desc_method'
+>> $VERBOSE = true
 >> output = A.desc_method(:go, :want_the_description_returned => true).join(' ')
 >> output.include? 'a = 33'
 => true

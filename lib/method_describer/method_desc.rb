@@ -18,29 +18,37 @@ module SourceLocationDesc
   # TODO does this work with class methods?
   def desc want_just_summary = false, want_the_description_returned = false
     doc = []
-
+    #_dbg
     # to_s is something like "#<Method: String#strip>"
     # or #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
     # or "#<Method: A.go>"
-    # or "#<Method: Order(id: integer, order_number: integer, created_on: datetime, shipped_on: datetime, order_user_id: integer, order_status_code_id: integer, notes: text, referer: string, order_shipping_type_id: integer, product_cost: float, shipping_cost: float, tax: float, auth_transaction_id: string, promotion_id: integer, shipping_address_id: integer, billing_address_id: integer, order_account_id: integer).get_cc_processor>"
+    # or "#<Method: Order(id: integer, order_number: integer).get_cc_processor>"
+    # or "#<Method: Order(id: integer, order_number: integer)(ActiveRecord::Base).get_cc_processor>"
 
     string = to_s
 
-    if string.include? ')#'
+    # derive class_name
+    parenthese_count = string.count '('
+
+    if parenthese_count== 1
       # case #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
-      string =~ /\((.*)\)/ # extract out what is between parentheses for the classname
+      # case #<Method: Order(id: integer, order_number: integer).get_cc_processor>
+      if string.include? "id: " # TODO huh?
+        string =~ /Method: (.+)\(/
+      else
+        string =~ /\(([^\(]+)\)[\.#]/ # extract out what is between last parentheses
+      end
       class_name = $1
-    elsif string.include?( '(' ) && string.include?( ').' )
-      # case "Method: Order(id:...).class_method"
-      string =~ /Method: (.*)\(/
-      class_name = $1
-    elsif string =~ /Method: (.*)\..*>/
+    elsif parenthese_count == 0
       # case "#<Method: A.go>"
+      string =~ /Method: ([^#\.]+)/
+      class_name = $1
+    elsif parenthese_count == 2
+      # case "#<Method: Order(id: integer, order_number: integer)(ActiveRecord::Base).get_cc_processor>"
+      string =~ /\(([^\(]+)\)[\.#]/
       class_name = $1
     else
-      # case "#<Method: String#strip>"
-      string =~ /Method: (.*)#.*/
-      class_name = $1
+      raise 'bad ' + string
     end
 
     # now get method name, type
@@ -48,7 +56,7 @@ module SourceLocationDesc
     joiner = $1
     method_name = $2
     full_name = "#{class_name}#{joiner}#{method_name}"
-    puts "#{to_s}      arity: #{arity}" 
+    puts "sig: #{to_s}      arity: #{arity}"
     # TODO add to doc, I want it before ri for now though, and only once, so not there yet :)
 
     # now run default RI for it
@@ -76,12 +84,14 @@ module SourceLocationDesc
         out = []
         args.each{|arg_pair|
           out << arg_pair.join(' = ')
-        }
+        } if args
         out = out.join(', ')
         return out if want_just_summary
 
-        doc << "Parameters: #{method_name}(" + out + ")"
+        param_string = "Parameters: #{method_name}(" + out + ")" 
+        doc << param_string unless want_the_description_returned
       rescue Exception => e
+
         puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $VERBOSE
       end
     else
@@ -115,6 +125,7 @@ module SourceLocationDesc
       else
         doc << 'appears to be a c method'
       end
+      param_string = to_s
       if respond_to? :parameters
         doc << "Original code signature: %s" % sig.to_s.strip if sig
         doc << "#parameters signature: %s( %p )" % [name, parameters]
@@ -124,9 +135,9 @@ module SourceLocationDesc
     puts doc # always output it since RI does currently [todo make optional I suppose, and non out-putty]
 
     if want_the_description_returned # give them something they can examine
-       doc
+      doc
     else
-       self
+      param_string
     end
   end
 

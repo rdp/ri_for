@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{desc_method}
-  s.version = "0.1.4"
+  s.version = "0.1.5"
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.] at runtime, for example while debugging.}
   s.email = ["rogerdpack@gmail.comm"]
@@ -18,6 +18,7 @@ end
 
 # 0.1.
      #4 say searching ri for cause it takes forever...
+     #4 finally work for rails-y methods
 # 0.1.3 return something useful instead of nil
 # 0.1.2 fix bug
 # 0.1.1 minor cleanups on 1.9 [for release]
