@@ -1,11 +1,13 @@
-A "run time RI for ruby methods", this gem allows you to query for information about objects' methods within irb or a ruby-debug prompt.  It reveals everything known about the method.  This includes source, ri, arity, rdoc comments (on 1.9), etc. where available 
+A "run time RI for ruby methods", this gem allows you to query for information about objects' methods at runtime--for example within irb or ruby-debug.  It reveals everything known about the method.  This includes source, ri, arity, rdoc comments (1.9 only), etc.
 
-For me it has proved quite useful, and I wouldn't do a ruby-debug session without it--try it--you might really like it.
+For me it has proved quite useful, and I wouldn't do a ruby-debug session without it--you might really like it.
 
 Examples:
+
 >> class A; 
     def go(a); end; 
    end
+
 >> A.desc_method :go
 #<UnboundMethod: A#go>      arity: 1
 ri for A#go
@@ -15,6 +17,7 @@ def go(a)
   # do nothing
 end
 Parameters: go(a)
+
 >> File.desc_method :delete
 ri for File.delete
 ----------------------------------------------------------- File::delete
@@ -31,11 +34,11 @@ ri for File.delete
 appears to be a c method
 #parameters signature: delete( [[:rest]] )
 
+Or (my favorite) a debug session:
 
-Or (my favorite) using it in a debug session:
 (rdb:1) l=
 ...
-=> 74       assert(assigns['order'].order_line_items.map(:unit_price).min >= -5)
+ 74       assert(assigns['order'].order_line_items.map(:unit_price).min >= -5)
 ...
 (rdb:1) desc_method :assert
 #<Method: StoreControllerTest(Test::Unit::Assertions)#assert>      arity: -2
@@ -61,10 +64,11 @@ def assert(boolean, message = nil)
   end
 end
 Parameters: assert(boolean, message = nil)
-(rdb:1)
+
+Thus, you can look at methods' source/rdocs without having to step into them.  Deftly convenient.
 
 ========= How to Install=====
-$ gem install rogerdpack-desc_method 
+$ gem install rogerdpack-desc_method
 or
 $ gem install rogerdpack-desc_method --source http://gems.github.com 
 if you don't have gems.github.com as a gem source.
@@ -73,24 +77,23 @@ Usage:
 >> require 'desc_method'
 >> Class.desc_method :method_name # class or instance method name
 ...
->> some_object.desc_method :method_name
-...
+>> some_instance.desc_method :method_name
 
-Other goodies also included:
-Class#desc_class
+Other goodies included:
 
-Examples:
+Class#desc_class method
+
+An example:
 >> Object.desc_class
 # outputs descriptive info about that class--RI, method list, etc.
 >> Object.desc_class :verbose => true
 # outputs RI, method lists including inherited methods, ancestors, all constants etc.
 
-Kernel#methods 
-This has been monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
+Kernel#methods has been monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
 >> instance.methods
 => [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method] # adds in that separator
 
-Though I'll probably remove that in a future release since it turns out you can just run Kernel#methods(false) for about as much usefulness.
+I'll probably remove that in a future release since it turns out you can just run Kernel#methods(false) for about much.
 
 === Thanks ===
 This gem wraps for convenience the functionality of Method#source_location, ruby2ruby, et al, and also contains some code inspiration from manvenu, SourceRef (MBARI), and Python's Method#desc.  It also wouldn't be useful without irb and the ruby-debug folks. Thanks!
