@@ -1,9 +1,9 @@
 =begin rdoc
- Supplement [monkey patch] Kernel#methods so that it returns lists that are split into two kind of [adds a marker where the inherited methods begin].
+ add method methods2 so that it returns lists that are split into two kind of [adds a marker where the inherited methods begin].
 =end
 module Kernel
   alias :methods_old :methods
-  def methods all = true
+  def methods2 all = true
     if all
       # give some marker designating when the inherited methods start
       (public_methods(false) << :"inherited methods after this point >>") + (public_methods(true) - public_methods(false))
