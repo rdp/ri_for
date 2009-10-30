@@ -18,7 +18,6 @@ module SourceLocationDesc
   # TODO does this work with class methods?
   def desc want_just_summary = false, want_the_description_returned = false
     doc = []
-    #_dbg
     # to_s is something like "#<Method: String#strip>"
     # or #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
     # or "#<Method: A.go>"
@@ -59,14 +58,6 @@ module SourceLocationDesc
     puts "sig: #{to_s}      arity: #{arity}"
     # TODO add to doc, I want it before ri for now though, and only once, so not there yet :)
 
-    # now run default RI for it
-    begin
-      puts 'searching ri for ' + full_name + "..."
-      RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
-    rescue *[StandardError, SystemExit]
-      # not found
-    end
-    puts '(end ri)'
 
     # now gather up any other information we now about it, in case there are no rdocs
 
@@ -121,6 +112,7 @@ module SourceLocationDesc
           end
         }
         # how do I get the rest now?
+        already_got_ri = true
         return sig + "\n" + head[0] if want_just_summary
       else
         doc << 'appears to be a c method'
@@ -133,6 +125,17 @@ module SourceLocationDesc
     end
 
     puts doc # always output it since RI does currently [todo make optional I suppose, and non out-putty]
+
+
+    # now run default RI for it
+    begin
+      puts 'searching ri for ' + full_name + "..."
+      RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
+    rescue *[StandardError, SystemExit]
+      # not found
+    finally
+      puts '(end ri)'
+    end unless already_got_ri
 
     if want_the_description_returned # give them something they can examine
       doc

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{desc_method}
-  s.version = "0.1.5"
+  s.version = "0.1.6"
   s.authors = ["Roger Pack"]
   s.description = s.summary = %q{ruby method describer to make it possible to inspect methods [rdoc, signature, etc.] at runtime, for example while debugging.}
   s.email = ["rogerdpack@gmail.comm"]
@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<ruby2ruby>)
 end
 
+#    6 skip RI in 1.9, always after, now
 # 0.1.
      #4 say searching ri for cause it takes forever...
      #4 finally work for rails-y methods
