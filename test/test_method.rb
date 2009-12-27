@@ -1,3 +1,4 @@
+require 'ffi'
 class A
  # a suh-weet rdoc
  def go(a=5)
@@ -32,4 +33,7 @@ it should return you something useful
 => false
 >> A.ri_for(:go) == nil
 => false
+
+it should work with Module
+>> FFI::Library.ri_for :attach_function
 =end

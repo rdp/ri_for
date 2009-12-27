@@ -78,6 +78,7 @@ module SourceLocationDesc
           out << arg_pair.join(' = ')
         } if args
         out = out.join(', ')
+        param_string = out
         return out if want_just_summary
 
         param_string = "Parameters: #{method_name}(" + out + ")" 
@@ -89,6 +90,7 @@ module SourceLocationDesc
     else
       # 1.9.x
       file, line = source_location
+      param_string = to_s
       if file
         # then it's a pure ruby method
         all_lines = File.readlines(file)
@@ -113,11 +115,11 @@ module SourceLocationDesc
           end
         }
         already_got_ri = true
+        param_string = sig
         return sig + "\n" + head[0] if want_just_summary
       else
         doc << 'appears to be a c method'
       end
-      param_string = to_s
       if respond_to? :parameters
         doc << "Original code signature: %s" % sig.to_s.strip if sig
         doc << "#parameters signature: %s( %p )" % [name, parameters]
@@ -140,7 +142,7 @@ module SourceLocationDesc
     if want_the_description_returned # give them something they can examine
       doc
     else
-      param_string
+      param_string # one liner
     end
   end
 
@@ -154,7 +156,7 @@ class UnboundMethod; include SourceLocationDesc; end
 class Object
   # currently rather verbose, but will attempt to describe all it knows about a method
   def ri_for name, options = {}
-    if self.is_a? Class
+    if self.is_a?(Class) || self.is_a?(Module)
       # i.e. String.strip
       begin
         instance_method(name).ri(options) 
