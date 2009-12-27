@@ -32,20 +32,20 @@ end
 =begin
 doctest: should parse funky inspect classes [railsy], too
 
-doctest_require: '../lib/desc_method'
+doctest_require: '../lib/ri_for'
 >> $VERBOSE = true
->> A.desc_method(:go, :want_the_description_returned => true).join('..')
->> A.desc_method(:go2, :want_the_description_returned => true).join('..')
->> B.desc_method(:go2, :want_the_description_returned => true).join('..').include?('35')
+>> A.ri_for(:go, :want_the_description_returned => true).join('..')
+>> A.ri_for(:go2, :want_the_description_returned => true).join('..')
+>> B.ri_for(:go2, :want_the_description_returned => true).join('..').include?('35')
 => true
->> RUBY_VERSION > '1.8' || A.desc_method(:go2, :want_the_description_returned => true).join('..').include?('suh-weet rdoc')
+>> RUBY_VERSION > '1.8' || A.ri_for(:go2, :want_the_description_returned => true).join('..').include?('suh-weet rdoc')
 => true
->> A.desc_method(:go2, :want_the_description_returned => true).join('..').include? 'never be shown'
+>> A.ri_for(:go2, :want_the_description_returned => true).join('..').include? 'never be shown'
 => false
 
 # dual whammy... TODO do these test provide full coverage?
 
->> RUBY_VERSION > '1.8' || A.desc_method(:go_here, :want_the_description_returned => true).join('..').include?('345')
->> RUBY_VERSION > '1.8' || A.desc_method(:go_here, :want_the_description_returned => true).join('..').include?('345')
+>> RUBY_VERSION > '1.8' || A.ri_for(:go_here, :want_the_description_returned => true).join('..').include?('345')
+>> RUBY_VERSION > '1.8' || A.ri_for(:go_here, :want_the_description_returned => true).join('..').include?('345')
 
 =end

@@ -50,7 +50,7 @@ also lists constants
 => 1 # should be none since we didn't add any constants to A
 
 should work with sub methods
->> String.desc_method(:strip)
+>> String.ri_for(:strip)
 
 doctest_require: '../method_desc'
 =end

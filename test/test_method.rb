@@ -9,27 +9,27 @@ class A
  end
 end
 =begin
-doctest_require: '../lib/desc_method'
+doctest_require: '../lib/ri_for'
 >> $VERBOSE = true
->> output = A.desc_method(:go, :want_the_description_returned => true).join(' ')
+>> output = A.ri_for(:go, :want_the_description_returned => true).join(' ')
 >> output.include? 'a = 33'
 => true
 >> RUBY_VERSION < '1.9' || output.include?('suh-weet')
 => true
 
->> output = A.new.desc_method(:go, :want_the_description_returned => true).join(' ')
+>> output = A.new.ri_for(:go, :want_the_description_returned => true).join(' ')
 >> output.include? 'a = 33'
 => true
 >> RUBY_VERSION < '1.9' || output.include?('suh-weet')
 => true
 
->> output = A.desc_method(:go2, :want_the_description_returned => true).join(' ')
+>> output = A.ri_for(:go2, :want_the_description_returned => true).join(' ')
 >> output.include? 'b = 3'
 => true
 
 it should return you something useful
->> A.desc_method(:go2) == nil
+>> A.ri_for(:go2) == nil
 => false
->> A.desc_method(:go) == nil
+>> A.ri_for(:go) == nil
 => false
 =end

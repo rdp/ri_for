@@ -3,20 +3,21 @@ require 'rubygems'
 require 'rdoc'
 require 'rdoc/ri/driver'
 require 'sane'
-begin
-  gem 'arguments' # TODO why is this necessary?
+if RUBY_VERSION < '1.9'
+  require 'ruby2ruby'
+  require 'parse_tree'
+  gem 'rdp-arguments' # TODO why is this necessary?
   require 'arguments' # rogerdpack-arguments
-rescue LoadError
-  require 'arguments' # 1.9
 end
-require 'ruby2ruby'
 
 module SourceLocationDesc
 
   # add a Method#desc which spits out all it knows about that method
   # ri, location, local ri, etc.
   # TODO does this work with class methods?
-  def desc want_just_summary = false, want_the_description_returned = false
+  def ri options = {}
+    want_just_summary = options[:want_just_summary]
+    want_the_description_returned = options[:want_the_description_returned]
     doc = []
     # to_s is something like "#<Method: String#strip>"
     # or #<Method: GiftCertsControllerTest(Test::Unit::TestCase)#get>
@@ -71,7 +72,7 @@ module SourceLocationDesc
         else
           doc << RubyToRuby.new.process(ParseTree.translate(klass.singleton_class, method_name))
         end
-        args = Arguments.names( klass, method_name) rescue Arguments.names(klass.singleton_class, method_name)
+        args = Arguments.names(klass, method_name) rescue Arguments.names(klass.singleton_class, method_name)
         out = []
         args.each{|arg_pair|
           out << arg_pair.join(' = ')
@@ -133,7 +134,7 @@ module SourceLocationDesc
       RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
     rescue *[StandardError, SystemExit]
       # not found
-    finally
+    ensure
       puts '(end ri)'
     end unless already_got_ri
 
@@ -144,8 +145,7 @@ module SourceLocationDesc
     end
   end
 
-  named_args_for :desc # just for fun, tests use it too, plus it should actually wurk without interfering...I think
-
+  alias :desc :ri
 end
 
 class Method; include SourceLocationDesc; end
@@ -154,10 +154,15 @@ class UnboundMethod; include SourceLocationDesc; end
 # TODO mixin from a separate module
 class Object
   # currently rather verbose, but will attempt to describe all it knows about a method
-  def desc_method name, options = {}
+  def ri_for name, options = {}
     if self.is_a? Class
       # i.e. String.strip
-      instance_method(name).desc(options) rescue method(name).desc(options) # rescue allows for Class.instance_method_name
+      begin
+        instance_method(name).ri(options) 
+      rescue NameError => e #allows for Class.instance_method_name
+        puts e, e.backtrace
+        method(name).ri(options) 
+      end
     else
       method(name).desc(options)
     end
@@ -181,9 +186,9 @@ and arity
 wurx with class methods
 >> class A; def self.go(a = 3); a=5; end; end
 >> class A; def go2(a=4) a =7; end; end
->> A.desc_method(:go)
->> A.desc_method(:go2)
+>> A.ri_for(:go)
+>> A.ri_for(:go2)
 
->> File.desc_method :delete
+>> File.ri_for :delete
 
 =end
