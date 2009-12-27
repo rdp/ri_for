@@ -91,7 +91,6 @@ module SourceLocationDesc
       file, line = source_location
       if file
         # then it's a pure ruby method
-        doc << "at #{file}:#{line}"
         all_lines = File.readlines(file)
         head_and_sig = all_lines[0...line]
         sig = head_and_sig[-1]
@@ -102,6 +101,7 @@ module SourceLocationDesc
           break unless line =~ /^\s*#(.*)/
           doc.unshift "     " + $1.strip
         end
+        doc.unshift " at #{file}:#{line}"
 
         # now the real code will end with 'end' same whitespace as the first
         sig_white_space = sig.scan(/\W+/)[0]
@@ -112,7 +112,6 @@ module SourceLocationDesc
             break
           end
         }
-        # how do I get the rest now?
         already_got_ri = true
         return sig + "\n" + head[0] if want_just_summary
       else

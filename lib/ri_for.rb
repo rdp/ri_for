@@ -1,3 +1,2 @@
-require 'rubygems'
 require 'sane'
-require_rel 'method_describer'
+require_rel 'ri_for'
