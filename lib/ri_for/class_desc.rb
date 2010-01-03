@@ -1,4 +1,5 @@
 require_rel 'method_ri'
+
 class Class
   # just runs ri against the class, outputs a big
   def desc_class options = {}
@@ -28,29 +29,3 @@ class Class
 
 end
 
-=begin
-doctest:
-
-it should return true if you run it against a "real" class
->> String.desc_class(:want_output => true).length > 1
-=> true
->> class A; end
->> A.desc_class(:want_output => true).length > 1
-=>  true
-
-it shouldn't report itself as an ancestor of itself
->> A.desc_class(:want_output => true).grep(/ancestors/).include? '[A]'
-=> false
-
-also lists constants
->> A.desc_class(:want_output => true, :verbose => true).grep(/constants/i)
-=> [] # should be none since we didn't add any constants to A
->> class A; B = 3; end
->> A.desc_class(:want_output => true, :verbose => true).grep(/constants/i).length
-=> 1 # should be none since we didn't add any constants to A
-
-should work with sub methods
->> String.ri_for(:strip)
-
-doctest_require: '../method_desc'
-=end
