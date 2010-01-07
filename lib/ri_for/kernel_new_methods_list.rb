@@ -13,8 +13,9 @@ module Kernel
   end
 end
 
-if $0 == __FILE__
-  class A; end
-  puts 'A.methods', A.methods(true).inspect, A.methods(false).inspect
-  puts 'A.new.methods', A.new.methods.inspect
+class Object
+ def my_methods(_super=false)
+   _methods = (_super) ? self.class.superclass.new.methods : Object.methods
+   (self.methods - _methods).sort
+ end
 end

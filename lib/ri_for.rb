@@ -1,2 +1,4 @@
 require 'sane'
-require_rel 'ri_for'
+for file in Dir[__dir__ + '/ri_for/*'] do
+	 require file
+end

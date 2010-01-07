@@ -65,7 +65,7 @@ module SourceLocationDesc
     if !(respond_to? :source_location)
       # pull out names for 1.8
       begin
-        klass = eval(class_name)
+      	klass = eval(class_name)
         # we don't call to_ruby to overcome ruby2ruby bug http://rubyforge.org/tracker/index.php?func=detail&aid=26891&group_id=1513&atid=5921
         if joiner == '#'
           raw_code = ParseTree.new.parse_tree_for_method(klass, method_name)
@@ -108,7 +108,7 @@ module SourceLocationDesc
         doc.unshift " at #{file}:#{line}"
 
         # now the real code will end with 'end' same whitespace as the first
-        sig_white_space = sig.scan(/\W+/)[0]
+        sig_white_space = sig.scan(/^\W+/)[0] || ""
         body = all_lines[line..-1]
         body.each{|line|
           doc << line
