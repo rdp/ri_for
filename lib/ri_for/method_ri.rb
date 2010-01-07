@@ -1,8 +1,8 @@
-# originally gleaned from http://p.ramaze.net/17901
 require 'rubygems'
 require 'rdoc'
 require 'rdoc/ri/driver'
 require 'sane'
+
 if RUBY_VERSION < '1.9'
   require 'ruby2ruby'
   require 'parse_tree'
@@ -55,12 +55,12 @@ module SourceLocationDesc
     string =~ /Method: .*([#\.])(.*)>/ # include the # or .
     joiner = $1
     method_name = $2
-    full_name = "#{class_name}#{joiner}#{method_name}"
-    puts "sig: #{to_s}      arity: #{arity}"
-    # TODO add to doc, I want it before ri for now though, and only once, so not there yet :)
-
-
-    # now gather up any other information we now about it, in case there are no rdocs
+    full_name = "#{class_name}#{joiner}#{method_name} arity #{arity}"
+    sig =  "sig: #{full_name}      arity: #{arity}"
+    doc << sig
+    param_string = sig
+    
+    # now gather up any other information we now about it, in case there are no rdocs, so we can see it early...
 
     if !(respond_to? :source_location)
       # pull out names for 1.8
@@ -68,11 +68,13 @@ module SourceLocationDesc
         klass = eval(class_name)
         # we don't call to_ruby to overcome ruby2ruby bug http://rubyforge.org/tracker/index.php?func=detail&aid=26891&group_id=1513&atid=5921
         if joiner == '#'
-          doc << RubyToRuby.new.process(ParseTree.translate(klass, method_name))
+          raw_code = ParseTree.new.parse_tree_for_method(klass, method_name)
         else
-          doc << RubyToRuby.new.process(ParseTree.translate(klass.singleton_class, method_name))
+          raw_code = ParseTree.new.parse_tree_for_method(klass.singleton_class, method_name)
         end
-        args = Arguments.names(klass, method_name) rescue Arguments.names(klass.singleton_class, method_name)
+        doc << Ruby2Ruby.new.process(ParseTree.new.process(raw_code))
+        
+        args = Arguments.names(klass, method_name, false) rescue Arguments.names(klass.singleton_class, method_name, false)
         out = []
         args.each{|arg_pair|
           out << arg_pair.join(' = ')
@@ -83,7 +85,7 @@ module SourceLocationDesc
         param_string = "Parameters: #{method_name}(" + out + ")" 
         doc << param_string unless want_the_description_returned
       rescue Exception => e
-
+        doc << "appears to be a c method"
         puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $VERBOSE
         doc << "appears to be a c method"
       end
@@ -131,7 +133,7 @@ module SourceLocationDesc
 
     # now run default RI for it
     begin
-      puts 'searching ri for ' + full_name + "..."
+      puts 'Searching ri for ' + full_name + "..."
       RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
     rescue *[StandardError, SystemExit]
       # not found
@@ -170,26 +172,5 @@ class Object
   end
 end
 
-
-=begin 
-doctest:
->> require 'pathname'
-it should display the name
->> Pathname.instance_method(:children).desc(:want_the_description_returned => true).grep(/children/).size > 0
-=>  true # ["#<UnboundMethod: Pathname#children>"]
-
-and arity
->> Pathname.instance_method(:children).desc(:want_the_description_returned => true).grep(/arity/)
-=> ["#<UnboundMethod: Pathname#children>     arity: -1"]
-
-# todo: one that is guaranteed to exit you early [no docs at all ever]
-
-wurx with class methods
->> class A; def self.go(a = 3); a=5; end; end
->> class A; def go2(a=4) a =7; end; end
->> A.ri_for(:go)
->> A.ri_for(:go2)
-
->> File.ri_for :delete
-
-=end
+# attribution
+# originally gleaned from http://p.ramaze.net/17901
