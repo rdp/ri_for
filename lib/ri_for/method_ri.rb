@@ -25,7 +25,7 @@ module SourceLocationDesc
     # or "#<Method: Order(id: integer, order_number: integer).get_cc_processor>"
     # or "#<Method: Order(id: integer, order_number: integer)(ActiveRecord::Base).get_cc_processor>"
 
-    string = to_s
+    string = param_string = to_s
 
     # derive class_name
     parenthese_count = string.count '('
@@ -78,7 +78,6 @@ module SourceLocationDesc
           out << arg_pair.join(' = ')
         } if args
         out = out.join(', ')
-        param_string = out
         return out if want_just_summary
 
         param_string = "Parameters: #{method_name}(" + out + ")" 
@@ -86,6 +85,7 @@ module SourceLocationDesc
       rescue Exception => e
 
         puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $VERBOSE
+        doc << "appears to be a c method"
       end
     else
       # 1.9.x

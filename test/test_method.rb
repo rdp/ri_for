@@ -36,4 +36,12 @@ it should return you something useful
 
 it should work with Module
 >> FFI::Library.ri_for :attach_function
+
+it should say c method for c
+>> output = String.ri_for(:strip, :want_the_description_returned => true).join(' ')
+>> output.include?('c method')
+=> true
+>> output = String.ri_for(:strip)
+>> output.nil?
+=> false
 =end
