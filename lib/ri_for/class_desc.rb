@@ -6,6 +6,8 @@ class Class
     # want_output = false, verbose = false
     begin
       puts "begin RI"
+      require 'rdoc'
+      require 'rdoc/ri/driver'
       RDoc::RI::Driver.run [to_s, '--no-pager']
       puts 'end ri'
     rescue SystemExit

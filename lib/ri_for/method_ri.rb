@@ -1,9 +1,7 @@
-require 'rubygems'
-require 'rdoc'
-require 'rdoc/ri/driver'
 require 'sane'
 
 if RUBY_VERSION < '1.9'
+  require 'rubygems'
   require 'ruby2ruby'
   require 'parse_tree'
   gem 'rdp-arguments' # TODO why is this necessary?
@@ -55,17 +53,16 @@ module SourceLocationDesc
     string =~ /Method: .*([#\.])(.*)>/ # include the # or .
     joiner = $1
     method_name = $2
-    full_name = "#{class_name}#{joiner}#{method_name} arity #{arity}"
-    sig =  "sig: #{full_name}      arity: #{arity}"
+    sig = "sig: #{class_name}#{joiner}#{method_name} arity #{arity}"
     doc << sig
     param_string = sig
-    
+
     # now gather up any other information we now about it, in case there are no rdocs, so we can see it early...
 
     if !(respond_to? :source_location)
       # pull out names for 1.8
       begin
-      	klass = eval(class_name)
+        klass = eval(class_name)
         # we don't call to_ruby to overcome ruby2ruby bug http://rubyforge.org/tracker/index.php?func=detail&aid=26891&group_id=1513&atid=5921
         if joiner == '#'
           raw_code = ParseTree.new.parse_tree_for_method(klass, method_name)
@@ -73,7 +70,7 @@ module SourceLocationDesc
           raw_code = ParseTree.new.parse_tree_for_method(klass.singleton_class, method_name)
         end
         doc << Ruby2Ruby.new.process(ParseTree.new.process(raw_code))
-        
+
         args = Arguments.names(klass, method_name, false) rescue Arguments.names(klass.singleton_class, method_name, false)
         out = []
         args.each{|arg_pair|
@@ -82,11 +79,11 @@ module SourceLocationDesc
         out = out.join(', ')
         return out if want_just_summary
 
-        param_string = "Parameters: #{method_name}(" + out + ")" 
+        param_string = "Parameters: #{method_name}(" + out + ")"
         doc << param_string unless want_the_description_returned
       rescue Exception => e
         doc << "appears to be a c method"
-        puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $VERBOSE
+        puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $DEBUG
         doc << "appears to be a c method"
       end
     else
@@ -128,48 +125,52 @@ module SourceLocationDesc
       end
     end
 
-    puts doc # always output it since RI does currently [todo make optional I suppose, and non out-putty]
+    puts doc unless want_the_description_returned
 
+    unless (already_got_ri || want_just_summary)
+      require 'rdoc'
+      require 'rdoc/ri/driver'
 
-    # now run default RI for it
-    begin
-      puts 'Searching ri for ' + full_name + "..."
-      RDoc::RI::Driver.run [full_name, '--no-pager'] unless want_just_summary
-    rescue *[StandardError, SystemExit]
-      # not found
-    ensure
-      puts '(end ri)'
-    end unless already_got_ri
+      # show default RI for it
+      begin
+        pps 'Searching ri for', sig, '...'
+        RDoc::RI::Driver.run [full_name, '--no-pager']
+      rescue *[StandardError, SystemExit]
+        # not found
+      ensure
+        puts '(end ri)'
+      end
+    end
 
     if want_the_description_returned # give them something they can examine
       doc
     else
-      param_string # one liner
+      param_string.strip # return one liner
     end
-  end
 
+  end
+  
   alias :desc :ri
+  
 end
 
 class Method; include SourceLocationDesc; end
 class UnboundMethod; include SourceLocationDesc; end
 
 # TODO mixin from a separate module
+
 class Object
   # currently rather verbose, but will attempt to describe all it knows about a method
   def ri_for name, options = {}
     if self.is_a?(Class) || self.is_a?(Module)
       # i.e. String.strip
       begin
-        instance_method(name).ri(options) 
+        instance_method(name).ri(options)
       rescue NameError => e #allow for Class.instance_method_name, Module.instance_method_name
-        method(name).ri(options) 
+        method(name).ri(options)
       end
     else
       method(name).desc(options)
     end
   end
 end
-
-# attribution
-# originally gleaned from http://p.ramaze.net/17901

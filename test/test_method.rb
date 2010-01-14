@@ -1,8 +1,6 @@
 require 'rubygems'
 require 'ffi'
 
-$VERBOSE = true
-
 class A
  # a suh-weet rdoc
  def go(a=5)
@@ -16,7 +14,6 @@ end
 
 =begin
 doctest_require: '../lib/ri_for'
->> $VERBOSE = true
 >> output = A.ri_for(:go, :want_the_description_returned => true).join(' ')
 >> output.include? 'a = 33'
 => true
@@ -41,7 +38,7 @@ it should return you something useful
 => false
 
 it should work with Module
->> FFI::Library.ri_for(:attach_function) == nil
+>> FFI::Library.ri_for(:attach_function, :want_the_description_returned => true).nil?
 => false
 
 it should say c method for c
@@ -96,9 +93,11 @@ it should display the name
 
 and arity
 >> Pathname.instance_method(:children).desc(:want_the_description_returned => true).grep(/arity/)
-=> ["sig: Pathname#children arity -1      arity: -1"]
+=> ["sig: Pathname#children arity -1"]
 
-# todo: one that is guaranteed to exit you early [no docs at all ever]
+it should not duplicate arity
+>> A.ri_for(:go, :want_the_description_returned => true).join(' ').scan(/arity/).length
+=> 1
 
 wurx with class methods
 >> class A; def self.go(a = 3); a=5; end; end
