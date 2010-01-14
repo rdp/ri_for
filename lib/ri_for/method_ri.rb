@@ -162,8 +162,7 @@ class Object
       # i.e. String.strip
       begin
         instance_method(name).ri(options) 
-      rescue NameError => e #allows for Class.instance_method_name
-        puts e, e.backtrace
+      rescue NameError => e #allow for Class.instance_method_name, Module.instance_method_name
         method(name).ri(options) 
       end
     else
