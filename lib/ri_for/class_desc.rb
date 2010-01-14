@@ -1,4 +1,4 @@
-require_rel 'method_ri'
+require_relative 'method_ri'
 
 class Class
   # just runs ri against the class, outputs a big
