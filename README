@@ -18,34 +18,36 @@ def go(a)
   # do nothing
 end
 Parameters: go(a)
-Searching ri for sig: A#go arity 1 ...
+Searching ri for
+sig: A#go arity 1
+...
+Nothing known about A
 (end ri)
 => "Parameters: go(a)"
 
-(or you could do A.ri_for :go -- it falls back to show the instance method if it can't find the class method)
-
 >> File.ri_for :delete
-ri for File.delete
+sig: File.delete arity -1
+appears to be a c method
+Searching ri for
+sig: File.delete arity -1
+...
 ----------------------------------------------------------- File::delete
      File.delete(file_name, ...)  => integer
      File.unlink(file_name, ...)  => integer
 
-     From Ruby 1.9.1
 ------------------------------------------------------------------------
      Deletes the named files, returning the number of names passed as
      arguments. Raises an exception on any error. See also +Dir::rmdir+.
 
 (end ri)
-#<Method: File.delete>     arity: -1
-appears to be a c method
-#parameters signature: delete( [[:rest]] )
+=> "sig: File.delete arity -1"
 
-Or (my favorite) a debug session:
 
-(rdb:1) l=
-...
+
+Or (my favorite) within debug session:
+
  74       assert(assigns['order'].order_line_items.map(:unit_price).min >= -5)
-...
+ 
 (rdb:1) desc_method :assert
 #<Method: StoreControllerTest(Test::Unit::Assertions)#assert>      arity: -2
 ri for Test::Unit::Assertions#assert
@@ -71,37 +73,37 @@ def assert(boolean, message = nil)
 end
 Parameters: assert(boolean, message = nil)
 
-Thus, you can look at methods' source/rdocs without having to step into them.  Deftly convenient.
+Thus, you can look at methods' source/rdocs without having to run the methods and step into them.  Deftly convenient.
 
-========= How to Install=====
-$ gem install rogerdpack-desc_method
-or
-$ gem install rogerdpack-desc_method --source http://gems.github.com 
-if you don't have gems.github.com as a gem source.
+
+=========Installation=====
+
+$ gem install ri_for
 
 Usage:
->> require 'desc_method'
->> Class.desc_method :method_name # class or instance method name
-...
->> some_instance.desc_method :method_name
+>> require 'ri_for'
+>> ClassName.ri_for :method_name # class or instance method name
+
+>> some_instance.ri_for :method_name
 
 Other goodies included:
 
-Class#desc_class method
+Object#my_methods (stolen from a website somewhere)
 
 An example:
->> Object.desc_class
-# outputs descriptive info about that class--RI, method list, etc.
->> Object.desc_class :verbose => true
-# outputs RI, method lists including inherited methods, ancestors, all constants etc.
+>> class A; def go; end; end
+>> A.new.my_methods
+=> {:first, :second, :third]}
 
-Kernel#methods has been monkey patched to output a "separator" between its inherited and non inherited methods--i.e.
->> instance.methods
-=> [:first, :second, :after_this_are_inherited>>>>>, :some_inherited_method, :another_inherited_method] # adds in that separator
+Object#methods2 (like #methods, but inserts a marker after my_methods are shown)
 
-I'll probably remove that in a future release since it turns out you can just run Kernel#methods(false) for about much.
+>> A.new.methods2
+=> ["go", :"inherited methods after this point >>", "to_yaml_style", "inspect", "methods_old", "clone", "public_methods", "display", "instance_variable_defined?", "equal?", "freeze", "to_yaml_properties", "methods"...]
 
-=== Thanks ===
-This gem wraps for convenience the functionality of Method#source_location, ruby2ruby, et al, and also contains some code inspiration from manvenu, SourceRef (MBARI), and Python's Method#desc.  It also wouldn't be useful without irb and the ruby-debug folks. Thanks!
+=== Attributions ===
 
-Comments/suggestions welcome rogerdpack on gmail or github
+This gem wraps for convenience the functionality of Method#source_location, ruby2ruby, et al, and was inspired by a snippet from manvenu, SourceRef (MBARI), and Python's Method#desc.  It also wouldn't be useful without irb and the ruby-debug folks. Thanks!
+
+Comments/suggestions welcome rogerdpack on gmail or rdp on github
+
+github.com/rdp/ri_for
