@@ -1,11 +1,14 @@
-require 'sane'
-
 if RUBY_VERSION < '1.9'
-  require 'rubygems'
   require 'ruby2ruby'
   require 'parse_tree'
   gem 'rdp-arguments' # TODO why is this necessary?
   require 'arguments' # rogerdpack-arguments
+end
+
+class Object
+  def singleton_class
+    class << self; self; end
+  end
 end
 
 module SourceLocationDesc
@@ -53,7 +56,8 @@ module SourceLocationDesc
     string =~ /Method: .*([#\.])(.*)>/ # include the # or .
     joiner = $1
     method_name = $2
-    sig = "sig: #{class_name}#{joiner}#{method_name} arity #{arity}"
+    full_name = class_name + joiner + method_name
+    sig = "sig: #{full_name} arity #{arity}"
     doc << sig
     param_string = sig
 
@@ -67,7 +71,7 @@ module SourceLocationDesc
         if joiner == '#'
           raw_code = ParseTree.new.parse_tree_for_method(klass, method_name)
         else
-          raw_code = ParseTree.new.parse_tree_for_method(klass.singleton_class, method_name)
+          raw_code = ParseTree.new.parse_tree_for_method(klass.singleton_class, method_name) # singleton_class
         end
         doc << Ruby2Ruby.new.process(ParseTree.new.process(raw_code))
 
@@ -84,7 +88,6 @@ module SourceLocationDesc
       rescue Exception => e
         doc << "appears to be a c method"
         puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $DEBUG
-        doc << "appears to be a c method"
       end
     else
       # 1.9.x
@@ -133,7 +136,7 @@ module SourceLocationDesc
 
       # show default RI for it
       begin
-        pps 'Searching ri for', sig, '...'
+        puts 'Searching ri for', sig, '...'
         RDoc::RI::Driver.run [full_name, '--no-pager']
       rescue *[StandardError, SystemExit]
         # not found
@@ -167,7 +170,11 @@ class Object
       begin
         instance_method(name).ri(options)
       rescue NameError => e #allow for Class.instance_method_name, Module.instance_method_name
-        method(name).ri(options)
+        begin
+          method(name).ri(options)
+        rescue NameError
+          raise NameError.new("appears that this object #{self} does not have this method #{name}")
+        end
       end
     else
       method(name).desc(options)

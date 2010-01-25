@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'ffi'
+require 'os'
 
 class A
  # a suh-weet rdoc
@@ -27,6 +28,7 @@ doctest_require: '../lib/ri_for'
 => true
 
 >> output = A.ri_for(:go22, :want_the_description_returned => true).join(' ')
+>> puts output
 >> output.include? 'b = 3'
 => true
 
@@ -105,6 +107,18 @@ wurx with class methods
 >> A.ri_for(:go)
 >> A.ri_for(:go2)
 
->> File.ri_for :delete
+# shouldn't duplicate "appear to be"
+doctest: fail
+>> a = File.ri_for(:delete, :want_the_description_returned => true).join(' ').scan(/appears to be/).length
+=> 1
+
+# should throw our own style exceptions
+>> e = nil;begin; File.ri_for(:unknown); rescue NameError => e; end
+>> e.to_s.include? "appears that"
+=> true
+
+>> a = `#{OS.ruby_bin} test_ri.rb`
+>> a.include? "File.delete(file_name"
+=> true
 
 =end

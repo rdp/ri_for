@@ -1,5 +1,3 @@
-require_relative 'method_ri'
-
 class Class
   # just runs ri against the class, outputs a big
   def desc_class options = {}

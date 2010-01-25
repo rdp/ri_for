@@ -1,6 +1,10 @@
-A "run time RI for ruby methods", this gem allows you to query for information about objects' methods at runtime--for example within irb or ruby-debug.  It reveals everything known about the method.  This includes source, ri, arity, rdoc comments (1.9 only), etc.
+TODO note my_methods
 
-For me it has proved quite useful, and I wouldn't do a ruby-debug session without it--you might really like it.
+ri_for gem:
+
+A "run time RI for existing methods", this gem allows you to grab a method's docu at runtime--for example within a irb.  It display the method's source code/comments, ri (if available), arity, parameters, etc.
+
+It has proved quite useful, and I wouldn't do a ruby-debug session without it--you might really like it.
 
 Examples:
 
@@ -8,17 +12,19 @@ Examples:
     def go(a); end; 
    end
 
->> A.desc_method :go
-#<UnboundMethod: A#go>      arity: 1
-ri for A#go
-Nothing known about A
-(end ri)
+>> A.new.ri_for :go
+sig: A#go arity 1
 def go(a)
   # do nothing
 end
 Parameters: go(a)
+Searching ri for sig: A#go arity 1 ...
+(end ri)
+=> "Parameters: go(a)"
 
->> File.desc_method :delete
+(or you could do A.ri_for :go -- it falls back to show the instance method if it can't find the class method)
+
+>> File.ri_for :delete
 ri for File.delete
 ----------------------------------------------------------- File::delete
      File.delete(file_name, ...)  => integer
