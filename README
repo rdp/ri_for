@@ -1,8 +1,6 @@
-TODO note my_methods
-
 ri_for gem:
 
-A "run time RI for existing methods", this gem allows you to grab a method's docu at runtime--for example within a irb.  It display the method's source code/comments, ri (if available), arity, parameters, etc.
+A "run time RI for existing methods", this gem allows you to grab a method's docu at runtime--for example within an irb session.  It display the method's source code/comments, ri (if available), arity, parameters, etc.
 
 It has proved quite useful, and I wouldn't do a ruby-debug session without it--you might really like it.
 
@@ -43,12 +41,11 @@ sig: File.delete arity -1
 => "sig: File.delete arity -1"
 
 
-
-Or (my favorite) within debug session:
+Or (my favorite) use it within debug session:
 
  74       assert(assigns['order'].order_line_items.map(:unit_price).min >= -5)
  
-(rdb:1) desc_method :assert
+(rdb:1) ri_for :assert
 #<Method: StoreControllerTest(Test::Unit::Assertions)#assert>      arity: -2
 ri for Test::Unit::Assertions#assert
 ------------------------------------------ Test::Unit::Assertions#assert
