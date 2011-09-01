@@ -1,32 +1,11 @@
-the ri_for gem:
+The ri_for gem allows "runtime documentation lookup", it show a method's source code/comments, ri (if available), arity, parameters, 
+etc. all at runtime (for example within an irb session).
 
-A "run time documentation lookup gem", this gem allows you to grab a method's docu at runtime--for example within an irb session.  
-It display the method's source code/comments, ri (if available), arity, parameters, etc.
+Don't know what a method does? Look it up!
+It has proven quite useful, and I wouldn't do a ruby-debug session without it--you might like it.
 
 Examples:
 
-given this class
-
->> class A; 
-    def go(a); end; 
-   end
-
->> A.new.ri_for :go
-sig: A#go arity 1
-def go(a)
-  # do nothing
-end
-Parameters: go(a)
-Searching ri for
-sig: A#go arity 1
-...
-Nothing known about A
-(end ri)
-=> "Parameters: go(a)"
-
-It has proven quite useful, and I wouldn't do a ruby-debug session without it--try it--you might like it.
-
-more examples:
 
 >> File.ri_for :delete
 
@@ -46,10 +25,31 @@ sig: File.delete arity -1
 (end ri)
 => "sig: File.delete arity -1"
 
+(or alternatively use >> File.method(:delete).ri_for)
+
+or, given this dynamically generated class, it can still show runtime parameter information:
+
+>> class A; 
+    def go(a); end; 
+   end
+
+>> A.new.ri_for :go
+
+sig: A#go arity 1
+def go(a)
+  # do nothing
+end
+Parameters: go(a)
+Searching ri for
+sig: A#go arity 1
+...
+Nothing known about A
+(end ri)
+=> "Parameters: go(a)"
 
 Or (my favorite) use it within debug session:
 
- 74       assert(assigns['order'].order_line_items.map(:unit_price).min >= -5)
+ 74       assert(true == false)
  
 (rdb:1) ri_for :assert
 #<Method: StoreControllerTest(Test::Unit::Assertions)#assert>      arity: -2
