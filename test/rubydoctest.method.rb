@@ -120,5 +120,14 @@ doctest: fail
 >> a = `#{OS.ruby_bin} test_ri.rb`
 >> a.include? "File.delete(file_name"
 => true
+=end
+
+=begin
+doctest: it should work with method objects themselves
+>> b = File.method(:delete)
+>> b.ri_for
+=> "sig: File.delete arity -1"
+
+# TODO
 
 =end

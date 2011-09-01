@@ -1,10 +1,11 @@
-ri_for gem:
+the ri_for gem:
 
-A "run time RI for existing methods", this gem allows you to grab a method's docu at runtime--for example within an irb session.  It display the method's source code/comments, ri (if available), arity, parameters, etc.
-
-It has proved quite useful, and I wouldn't do a ruby-debug session without it--you might really like it.
+A "run time documentation lookup gem", this gem allows you to grab a method's docu at runtime--for example within an irb session.  
+It display the method's source code/comments, ri (if available), arity, parameters, etc.
 
 Examples:
+
+given this class
 
 >> class A; 
     def go(a); end; 
@@ -23,7 +24,12 @@ Nothing known about A
 (end ri)
 => "Parameters: go(a)"
 
+It has proven quite useful, and I wouldn't do a ruby-debug session without it--try it--you might like it.
+
+more examples:
+
 >> File.ri_for :delete
+
 sig: File.delete arity -1
 appears to be a c method
 Searching ri for
@@ -71,7 +77,6 @@ end
 Parameters: assert(boolean, message = nil)
 
 Thus, you can look at methods' source/rdocs without having to run the methods and step into them.  Deftly convenient.
-
 
 =========Installation=====
 

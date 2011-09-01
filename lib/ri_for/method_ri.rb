@@ -1,8 +1,11 @@
+
 if RUBY_VERSION < '1.9'
-  require 'ruby2ruby'
-  require 'parse_tree'
-  gem 'rdp-arguments' # TODO why is this necessary?
-  require 'arguments' # rogerdpack-arguments
+  unless RUBY_PLATFORM =~ /java/
+    require 'ruby2ruby'
+    require 'parse_tree'
+    gem 'rdp-arguments' # TODO why is this necessary?
+    require 'arguments' # rdp-arguments
+  end
 end
 
 class Object
@@ -65,32 +68,36 @@ module SourceLocationDesc
 
     if !(respond_to? :source_location)
       # pull out names for 1.8
-      begin
-        klass = eval(class_name)
-        # we don't call to_ruby to overcome ruby2ruby bug http://rubyforge.org/tracker/index.php?func=detail&aid=26891&group_id=1513&atid=5921
-        if joiner == '#'
-          raw_code = ParseTree.new.parse_tree_for_method(klass, method_name)
-        else
-          raw_code = ParseTree.new.parse_tree_for_method(klass.singleton_class, method_name) # singleton_class
+      unless RUBY_PLATFORM =~ /java/
+        begin
+          klass = eval(class_name)
+          # we don't call to_ruby to overcome ruby2ruby bug http://rubyforge.org/tracker/index.php?func=detail&aid=26891&group_id=1513&atid=5921
+          if joiner == '#'
+            raw_code = ParseTree.new.parse_tree_for_method(klass, method_name)
+          else
+            raw_code = ParseTree.new.parse_tree_for_method(klass.singleton_class, method_name) # singleton_class
+          end
+          doc << Ruby2Ruby.new.process(ParseTree.new.process(raw_code))
+  
+          args = Arguments.names(klass, method_name, false) rescue Arguments.names(klass.singleton_class, method_name, false)
+          out = []
+          args.each{|arg_pair|
+            out << arg_pair.join(' = ')
+          } if args
+          out = out.join(', ')
+          return out if want_just_summary
+  
+          param_string = "Parameters: #{method_name}(" + out + ")"
+          doc << param_string unless want_the_description_returned
+        rescue Exception => e
+          doc << "appears to be a c method"
+          puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $DEBUG
         end
-        doc << Ruby2Ruby.new.process(ParseTree.new.process(raw_code))
-
-        args = Arguments.names(klass, method_name, false) rescue Arguments.names(klass.singleton_class, method_name, false)
-        out = []
-        args.each{|arg_pair|
-          out << arg_pair.join(' = ')
-        } if args
-        out = out.join(', ')
-        return out if want_just_summary
-
-        param_string = "Parameters: #{method_name}(" + out + ")"
-        doc << param_string unless want_the_description_returned
-      rescue Exception => e
-        doc << "appears to be a c method"
-        puts "fail to parse tree: #{class_name} #{e} #{e.backtrace}" if $DEBUG
+      else
+        doc << "jruby does not allow introspection of method parameter names in 1.8.x AFAIK"
       end
     else
-      # 1.9.x
+      # 1.9.x or REE
       file, line = source_location
       param_string = to_s
       if file
@@ -157,9 +164,6 @@ module SourceLocationDesc
   
 end
 
-class Method; include SourceLocationDesc; end
-class UnboundMethod; include SourceLocationDesc; end
-
 # TODO mixin from a separate module
 
 class Object
@@ -180,4 +184,14 @@ class Object
       method(name).desc(options)
     end
   end
+end
+
+class Method; 
+  include SourceLocationDesc
+  alias ri_for ri # allow for File.method(:delete).ri_for as well
+end
+
+class UnboundMethod
+  include SourceLocationDesc
+  alias ri_for ri
 end
