@@ -106,6 +106,18 @@ Object#methods2 (like #methods, but inserts a marker after my_methods are shown)
 
 This gem wraps for convenience the functionality of Method#source_location, ruby2ruby, et al, and was inspired by a snippet from manvenu, SourceRef (MBARI), and Python's Method#desc.  It also wouldn't be useful without irb and the ruby-debug folks. Thanks!
 
+=== Related ===
+
+https://github.com/dadooda/ori (just lists ri, not method bodies and parameters, like mine does).
+also irb has a "help" command for obtaining (just lists ri) but it's pretty obscure nobody knows about it.
+>> help "Array"
+>> help "Array#[]" (just displays ri)
+
+There are quite a few "#methods" helper utilties out there, too.  
+irbtools also lists a lot of other irb helpers.
+
+=== Feedback ===
+
 Comments/suggestions welcome rogerdpack on gmail or rdp on github
 
 github.com/rdp/ri_for
