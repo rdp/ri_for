@@ -116,6 +116,8 @@ also irb has a "help" command for obtaining (just lists ri) but it's pretty obsc
 There are quite a few "#methods" helper utilties out there, too.  
 irbtools also lists a lot of other irb helpers.
 
+https://github.com/banister/method_source is similar (I think it's embedded in pry as well)
+
 === Feedback ===
 
 Comments/suggestions welcome rogerdpack on gmail or rdp on github
